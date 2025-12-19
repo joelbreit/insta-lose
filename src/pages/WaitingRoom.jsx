@@ -12,31 +12,48 @@ function WaitingRoom() {
 	const navigate = useNavigate();
 	const [copied, setCopied] = useState(false);
 	const [player, setPlayer] = useState(null);
+	const [host, setHost] = useState(null);
+	const [isHost, setIsHost] = useState(false);
 	const [players, setPlayers] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isStarting, setIsStarting] = useState(false);
 	const [error, setError] = useState(null);
 	const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 
-	// Load player from localStorage
+	// Load player or host from localStorage
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
-		if (storedPlayer) {
+		const storedHost = localStorage.getItem("host");
+		
+		if (storedHost) {
+			const hostData = JSON.parse(storedHost);
+			// Verify this host belongs to this game
+			if (hostData.gameId === gameId) {
+				setHost(hostData);
+				setIsHost(true);
+			} else {
+				// Wrong game, redirect
+				navigate(`/waiting/${hostData.gameId}`);
+			}
+		} else if (storedPlayer) {
 			setPlayer(JSON.parse(storedPlayer));
+			setIsHost(false);
 		} else {
-			// No player info, redirect to join
+			// No player or host info, redirect to join
 			navigate(`/join?gameId=${gameId}`);
 		}
 	}, [gameId, navigate]);
 
 	// Poll for game state
 	const fetchGameState = useCallback(async () => {
-		if (!player) return;
+		if (!player && !host) return;
 
 		try {
+			// For host mode, don't send playerId (spectator mode)
+			const playerId = isHost ? null : player?.playerId;
 			const state = await getGameState(
 				gameId,
-				player.playerId,
+				playerId,
 				lastUpdatedAt
 			);
 
@@ -61,11 +78,11 @@ function WaitingRoom() {
 				setError(err.message || "Failed to load game");
 			}
 		}
-	}, [gameId, player, lastUpdatedAt, navigate]);
+	}, [gameId, player, host, isHost, lastUpdatedAt, navigate]);
 
 	// Initial load and polling
 	useEffect(() => {
-		if (!player) return;
+		if (!player && !host) return;
 
 		// Initial fetch
 		fetchGameState();
@@ -74,7 +91,7 @@ function WaitingRoom() {
 		const interval = setInterval(fetchGameState, POLL_INTERVAL);
 
 		return () => clearInterval(interval);
-	}, [player, fetchGameState]);
+	}, [player, host, fetchGameState]);
 
 	const copyGameCode = () => {
 		navigator.clipboard.writeText(gameId);
@@ -105,8 +122,11 @@ function WaitingRoom() {
 	};
 
 	// First player is the MVP (can start the game)
+	// Host cannot be MVP - only actual players can
 	const isMVP =
-		players.length > 0 && players[0].playerId === player?.playerId;
+		!isHost &&
+		players.length > 0 &&
+		players[0].playerId === player?.playerId;
 	const canStart = players.length >= 2;
 
 	return (
@@ -171,7 +191,21 @@ function WaitingRoom() {
 				</div>
 
 				<div className="text-center text-slate-500 dark:text-slate-400 mb-6">
-					{players.length < 2 ? (
+					{isHost ? (
+						players.length === 0 ? (
+							<p>Waiting for players to join...</p>
+						) : players.length < 2 ? (
+							<p>
+								{players.length} player joined. Need at least 2
+								players to start.
+							</p>
+						) : (
+							<p>
+								Waiting for {players[0]?.name} to start the
+								game...
+							</p>
+						)
+					) : players.length < 2 ? (
 						<p>Need at least 2 players to start</p>
 					) : isMVP ? (
 						<p>You're the MVP! Start when everyone's ready.</p>

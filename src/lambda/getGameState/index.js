@@ -55,7 +55,37 @@ exports.handler = async (event) => {
 			};
 		}
 
-		// Filter response - hide other players' hands
+		// Handle spectator mode (no playerId) - return full state without filtering
+		if (!playerId) {
+			const response = {
+				gameId: game.gameId,
+				status: game.status,
+				hostPlayerId: game.hostPlayerId,
+				currentTurnPlayerId: game.currentTurnPlayerId,
+				turnOrder: game.turnOrder,
+				deckCount: game.deck?.length || 0,
+				discardPileCount: game.discardPile?.length || 0,
+				players: game.players.map((player) => ({
+					playerId: player.playerId,
+					name: player.name,
+					icon: player.icon,
+					color: player.color,
+					cardCount: player.hand?.length || 0,
+					isAlive: player.isAlive,
+				})),
+				myHand: [], // No hand for spectators
+				actions: game.actions?.slice(-10) || [], // Last 10 actions
+				updatedAt: game.updatedAt,
+			};
+
+			return {
+				statusCode: 200,
+				headers,
+				body: JSON.stringify(response),
+			};
+		}
+
+		// Filter response - hide other players' hands for players
 		let myHand = [];
 		const filteredPlayers = game.players.map((player) => {
 			if (player.playerId === playerId) {

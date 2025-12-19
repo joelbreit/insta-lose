@@ -1,29 +1,41 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import { getGameState } from "../services/api";
 import { Trophy, Medal, Skull, Home, RotateCcw } from "lucide-react";
 
 function GameRecap() {
 	const { gameId } = useParams();
-	const navigate = useNavigate();
 	const [player, setPlayer] = useState(null);
+	const [host, setHost] = useState(null);
+	const [isHost, setIsHost] = useState(false);
 	const [gameState, setGameState] = useState(null);
 	const [error, setError] = useState(null);
 
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
-		if (storedPlayer) {
+		const storedHost = localStorage.getItem("host");
+
+		if (storedHost) {
+			const hostData = JSON.parse(storedHost);
+			if (hostData.gameId === gameId) {
+				setHost(hostData);
+				setIsHost(true);
+			}
+		} else if (storedPlayer) {
 			setPlayer(JSON.parse(storedPlayer));
+			setIsHost(false);
 		}
-	}, []);
+	}, [gameId]);
 
 	useEffect(() => {
 		async function fetchFinalState() {
-			if (!player) return;
+			if (!player && !host) return;
 
 			try {
-				const state = await getGameState(gameId, player.playerId);
+				// For host mode, don't send playerId (spectator mode)
+				const playerId = isHost ? null : player?.playerId;
+				const state = await getGameState(gameId, playerId);
 				setGameState(state);
 			} catch (err) {
 				console.error("Failed to fetch game state:", err);
@@ -32,7 +44,7 @@ function GameRecap() {
 		}
 
 		fetchFinalState();
-	}, [gameId, player]);
+	}, [gameId, player, host, isHost]);
 
 	if (error) {
 		return (
@@ -75,7 +87,7 @@ function GameRecap() {
 	const winner = gameState.players.find(
 		(p) => p.playerId === gameState.winnerId
 	);
-	const isWinner = player?.playerId === gameState.winnerId;
+	const isWinner = !isHost && player?.playerId === gameState.winnerId;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-indigo-100 to-white dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-white">

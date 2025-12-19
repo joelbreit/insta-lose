@@ -43,8 +43,8 @@
 
 ### Host
 
-- [ ] A host machine hosts a shared view for all players to see. The host machine is the one that is hosting the game. No players use this machine during the game.
-- [ ] The host machine starts a game
+- [x] A host machine hosts a shared view for all players to see. The host machine is the one that is hosting the game. No players use this machine during the game
+- [x] The host machine creates a game but does not start or participate in the game
 
 ### Serverless
 

@@ -31,26 +31,38 @@ function Game() {
 		actions: [],
 	});
 
-	// Load player from localStorage
+	const [isHost, setIsHost] = useState(false);
+
+	// Load player or host from localStorage
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
-		if (storedPlayer) {
+		const storedHost = localStorage.getItem("host");
+
+		if (storedHost) {
+			const hostData = JSON.parse(storedHost);
+			// Verify this host belongs to this game
+			if (hostData.gameId === gameId) {
+				setIsHost(true);
+				// Host doesn't need player data, but we set a flag
+			} else {
+				// Wrong game, redirect
+				navigate("/");
+			}
+		} else if (storedPlayer) {
 			setPlayer(JSON.parse(storedPlayer));
+			setIsHost(false);
 		} else {
 			navigate("/");
 		}
-	}, [navigate]);
+	}, [gameId, navigate]);
 
 	// Poll for game state
 	const fetchGameState = useCallback(async () => {
-		if (!player) return;
-
+		// Allow polling even if no player (host mode)
 		try {
-			const state = await getGameState(
-				gameId,
-				player.playerId,
-				lastUpdatedAt
-			);
+			// For host mode, don't send playerId (spectator mode)
+			const playerId = isHost ? null : player?.playerId;
+			const state = await getGameState(gameId, playerId, lastUpdatedAt);
 
 			if (state === null) {
 				// Not modified (304)
@@ -69,11 +81,12 @@ function Game() {
 		} catch (err) {
 			console.error("Failed to fetch game state:", err);
 		}
-	}, [gameId, player, lastUpdatedAt, navigate]);
+	}, [gameId, player, isHost, lastUpdatedAt, navigate]);
 
 	// Initial load and polling
 	useEffect(() => {
-		if (!player) return;
+		// Allow polling for both players and hosts
+		if (!player && !isHost) return;
 
 		// Initial fetch (force refresh)
 		setLastUpdatedAt(null);
@@ -83,13 +96,10 @@ function Game() {
 		const interval = setInterval(fetchGameState, POLL_INTERVAL);
 
 		return () => clearInterval(interval);
-	}, [player]); // Only depend on player, not fetchGameState
+	}, [player, isHost, fetchGameState]); // Include fetchGameState to satisfy linter
 
-	const isMyTurn = gameState.currentTurnPlayerId === player?.playerId;
-
-	console.log("isMyTurn", isMyTurn);
-	console.log("gameState.currentTurnPlayerId", gameState.currentTurnPlayerId);
-	console.log("player?.playerId", player?.playerId);
+	const isMyTurn =
+		!isHost && gameState.currentTurnPlayerId === player?.playerId;
 
 	const handleDrawCard = async () => {
 		if (!player || !isMyTurn || isActing) return;
@@ -193,16 +203,18 @@ function Game() {
 		}
 	};
 
-	// Find current player info
-	const myPlayerInfo = gameState.players.find(
-		(p) => p.playerId === player?.playerId
-	);
-	const isAlive = myPlayerInfo?.isAlive ?? true;
+	// Find current player info (only for actual players, not hosts)
+	const myPlayerInfo = isHost
+		? null
+		: gameState.players.find((p) => p.playerId === player?.playerId);
+	const isAlive = isHost ? true : myPlayerInfo?.isAlive ?? true;
 
-	// Get target selection for pairs
-	const otherAlivePlayers = gameState.players.filter(
-		(p) => p.playerId !== player?.playerId && p.isAlive
-	);
+	// Get target selection for pairs (only for players)
+	const otherAlivePlayers = isHost
+		? []
+		: gameState.players.filter(
+				(p) => p.playerId !== player?.playerId && p.isAlive
+		  );
 
 	return (
 		<div
@@ -243,6 +255,13 @@ function Game() {
 
 			{/* Main game area */}
 			<div className="flex-1 flex flex-col p-4">
+				{/* Host spectator indicator */}
+				{isHost && (
+					<div className="mb-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-center text-sm font-medium">
+						👁️ Spectator Mode - You're watching the game
+					</div>
+				)}
+
 				{/* Error display */}
 				{error && (
 					<div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl text-center text-sm">
@@ -321,7 +340,15 @@ function Game() {
 
 				{/* Turn indicator */}
 				<div className="text-center mb-6">
-					{!isAlive ? (
+					{isHost ? (
+						<div className="inline-block px-6 py-2 bg-slate-400 text-white rounded-full">
+							{gameState.players.find(
+								(p) =>
+									p.playerId === gameState.currentTurnPlayerId
+							)?.name || "..."}
+							's turn
+						</div>
+					) : !isAlive ? (
 						<div className="inline-block px-6 py-2 bg-red-500 text-white rounded-full font-semibold">
 							💀 Eliminated
 						</div>
@@ -352,8 +379,8 @@ function Game() {
 				{/* Spacer */}
 				<div className="flex-1" />
 
-				{/* Target selection for pairs */}
-				{selectedCard?.needsTarget && (
+				{/* Target selection for pairs - only for players */}
+				{!isHost && selectedCard?.needsTarget && (
 					<div className="mb-6 p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
 						<div className="text-center text-purple-700 dark:text-purple-300 font-medium mb-3">
 							👯 Choose a player to steal from:
@@ -387,8 +414,8 @@ function Game() {
 					</div>
 				)}
 
-				{/* Draw button */}
-				{isMyTurn && isAlive && (
+				{/* Draw button - only for players, not hosts */}
+				{!isHost && isMyTurn && isAlive && (
 					<button
 						onClick={handleDrawCard}
 						disabled={isActing}
@@ -399,8 +426,8 @@ function Game() {
 				)}
 			</div>
 
-			{/* Card hand */}
-			{isAlive && (
+			{/* Card hand - only for players, not hosts */}
+			{!isHost && isAlive && (
 				<CardHand
 					cards={gameState.myHand}
 					selectedCard={

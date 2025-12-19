@@ -14,14 +14,14 @@ export const API_ENDPOINTS = {
 
 /**
  * Create a new game
- * @param {Object} params - { hostPlayerId, hostName, hostIcon, hostColor }
+ * @param {Object} params - { hostPlayerId }
  * @returns {Promise<{ gameId: string, game: Object }>}
  */
-export async function createGame({ hostPlayerId, hostName, hostIcon, hostColor }) {
+export async function createGame({ hostPlayerId }) {
 	const response = await fetch(API_ENDPOINTS.createGame, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ hostPlayerId, hostName, hostIcon, hostColor }),
+		body: JSON.stringify({ hostPlayerId }),
 	});
 
 	if (!response.ok) {
@@ -56,11 +56,11 @@ export async function joinGame(gameId, { playerId, name, icon, color }) {
 /**
  * Get current game state (for polling)
  * @param {string} gameId - The game code
- * @param {string} playerId - The current player's ID
+ * @param {string|null} playerId - The current player's ID (null for spectator mode)
  * @param {number} lastUpdatedAt - Timestamp of last known update (for 304 optimization)
  * @returns {Promise<Object|null>} - Returns null if not modified (304)
  */
-export async function getGameState(gameId, playerId, lastUpdatedAt = null) {
+export async function getGameState(gameId, playerId = null, lastUpdatedAt = null) {
 	const url = new URL(API_ENDPOINTS.getGameState(gameId));
 	if (playerId) url.searchParams.set("playerId", playerId);
 	if (lastUpdatedAt) url.searchParams.set("lastUpdatedAt", lastUpdatedAt.toString());

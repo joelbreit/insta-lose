@@ -64,10 +64,10 @@ exports.handler = async (event) => {
 
 	try {
 		const body = JSON.parse(event.body);
-		const { hostPlayerId, hostName, hostIcon, hostColor } = body;
+		const { hostPlayerId } = body;
 
 		// Validate required fields
-		if (!hostPlayerId || !hostName) {
+		if (!hostPlayerId) {
 			return {
 				statusCode: 400,
 				headers,
@@ -89,16 +89,7 @@ exports.handler = async (event) => {
 			turnOrder: [],
 			deck: [],
 			discardPile: [],
-			players: [
-				{
-					playerId: hostPlayerId,
-					name: hostName,
-					icon: hostIcon || "🐱",
-					color: hostColor || "bg-blue-500",
-					hand: [],
-					isAlive: true,
-				},
-			],
+			players: [], // Host is not a player - players array starts empty
 			actions: [],
 		};
 

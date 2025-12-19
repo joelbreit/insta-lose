@@ -1,42 +1,31 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import PlayerSetup from "../components/PlayerSetup";
 import { generatePlayerId } from "../utils/gameUtils";
 import { createGame } from "../services/api";
 
 function CreateGame() {
 	const navigate = useNavigate();
-	const [playerName, setPlayerName] = useState("");
-	const [playerIcon, setPlayerIcon] = useState("🐱");
-	const [playerColor, setPlayerColor] = useState("bg-blue-500");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 
 	const handleCreateGame = async () => {
-		if (!playerName.trim()) return;
-
 		setIsLoading(true);
 		setError(null);
 
-		const playerId = generatePlayerId();
+		const hostPlayerId = generatePlayerId();
 
 		try {
 			const { gameId } = await createGame({
-				hostPlayerId: playerId,
-				hostName: playerName,
-				hostIcon: playerIcon,
-				hostColor: playerColor,
+				hostPlayerId,
 			});
 
-			// Store player info in localStorage
+			// Store host info in localStorage (not player info)
 			localStorage.setItem(
-				"player",
+				"host",
 				JSON.stringify({
-					playerId,
-					name: playerName,
-					icon: playerIcon,
-					color: playerColor,
+					hostPlayerId,
+					gameId,
 					isHost: true,
 				})
 			);
@@ -65,18 +54,15 @@ function CreateGame() {
 					</div>
 				)}
 
-				<PlayerSetup
-					name={playerName}
-					setName={setPlayerName}
-					icon={playerIcon}
-					setIcon={setPlayerIcon}
-					color={playerColor}
-					setColor={setPlayerColor}
-				/>
+				<div className="mb-8 p-6 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+					<p className="text-slate-600 dark:text-slate-400 text-center">
+						Create a game room and share the code with your friends. You'll be able to watch the game as it happens.
+					</p>
+				</div>
 
 				<button
 					onClick={handleCreateGame}
-					disabled={!playerName.trim() || isLoading}
+					disabled={isLoading}
 					className="w-full mt-8 py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white text-xl font-semibold rounded-xl transition-colors"
 				>
 					{isLoading ? "Creating..." : "Create Game"}
