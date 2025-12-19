@@ -62,9 +62,16 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 							<span className="text-2xl">
 								{cardType?.icon || "?"}
 							</span>
-							<span className="text-xs font-medium text-center px-1">
-								{cardType?.name || card.type}
-							</span>
+							{/* If pairs, show the pair type */}
+							{card.type.startsWith("pairs-") ? (
+								<span className="text-xs font-medium text-center px-1">
+									{card.type.split("-")[1]}
+								</span>
+							) : (
+								<span className="text-xs font-medium text-center px-1">
+									{cardType?.name}
+								</span>
+							)}
 						</button>
 					);
 				})}

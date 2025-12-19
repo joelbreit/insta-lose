@@ -278,11 +278,16 @@ function Game() {
 							👁️ Top 3 cards of the deck:
 						</div>
 						<div className="flex justify-center gap-2">
-							{peekedCards.map((card, index) => {
-								const cardType = CARD_TYPES[card.type];
+							{peekedCards.map((card) => {
+								const normalizedType = card.type?.startsWith(
+									"pairs-"
+								)
+									? "pairs"
+									: card.type;
+								const cardType = CARD_TYPES[normalizedType];
 								return (
 									<div
-										key={index}
+										key={card.id}
 										className={`w-16 h-24 rounded-lg flex flex-col items-center justify-center ${
 											cardType?.bgColor || "bg-slate-500"
 										} ${
@@ -292,9 +297,15 @@ function Game() {
 										<span className="text-xl">
 											{cardType?.icon || "?"}
 										</span>
-										<span className="text-xs mt-1">
-											{cardType?.name || card.type}
-										</span>
+										{card.type.startsWith("pairs-") ? (
+											<span className="text-xs font-medium text-center px-1">
+												{card.type.split("-")[1]}
+											</span>
+										) : (
+											<span className="text-xs font-medium text-center px-1">
+												{cardType?.name}
+											</span>
+										)}
 									</div>
 								);
 							})}

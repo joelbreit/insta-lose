@@ -178,7 +178,7 @@ function GameRecap() {
 				{/* Theme song link (from plan) */}
 				<div className="text-center mb-8">
 					<a
-						href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+						href="https://suno.com/s/QFee4suGpweV5GXn"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
