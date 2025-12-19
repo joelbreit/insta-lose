@@ -2,7 +2,14 @@ import { useState } from "react";
 import { CARD_TYPES } from "../utils/cardTypes";
 import { Info, Play, X } from "lucide-react";
 
-function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
+function CardHand({
+	cards,
+	selectedCard,
+	onSelectCard,
+	onPlayCard,
+	canPlay,
+	isCardPlayable,
+}) {
 	const [showInfo, setShowInfo] = useState(null);
 
 	return (
@@ -17,15 +24,26 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 						<Info className="h-4 w-4" />
 						Info
 					</button>
-					{canPlay && (
-						<button
-							onClick={() => onPlayCard(selectedCard.id)}
-							className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg"
-						>
-							<Play className="h-4 w-4" />
-							Play
-						</button>
-					)}
+					{canPlay &&
+						isCardPlayable &&
+						isCardPlayable(selectedCard) && (
+							<button
+								onClick={() => onPlayCard(selectedCard.id)}
+								className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg"
+							>
+								<Play className="h-4 w-4" />
+								Play
+							</button>
+						)}
+					{canPlay &&
+						isCardPlayable &&
+						!isCardPlayable(selectedCard) && (
+							<div className="text-sm text-slate-600 dark:text-slate-400 px-4 py-2">
+								{selectedCard.type === "panic"
+									? "Panic cards can only be played automatically when you draw an Insta-Lose card"
+									: "You need a matching pair card to play this card"}
+							</div>
+						)}
 					<button
 						onClick={() => onSelectCard(null)}
 						className="p-2 text-slate-500 hover:text-slate-700"
@@ -44,6 +62,10 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 						: card.type;
 					const cardType = CARD_TYPES[normalizedType];
 					const isSelected = selectedCard?.id === card.id;
+					const cardPlayable = isCardPlayable
+						? isCardPlayable(card)
+						: true;
+					const isNotPlayable = canPlay && !cardPlayable;
 
 					return (
 						<button
@@ -51,13 +73,20 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 							onClick={() =>
 								onSelectCard(isSelected ? null : card)
 							}
-							className={`flex-shrink-0 w-20 h-28 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
+							className={`flex-shrink-0 w-20 h-28 rounded-xl flex flex-col items-center justify-center gap-1 transition-all relative ${
 								cardType?.bgColor || "bg-slate-500"
 							} ${cardType?.textColor || "text-white"} ${
 								isSelected
 									? "ring-4 ring-indigo-500 scale-110 -translate-y-2"
 									: "hover:scale-105"
-							}`}
+							} ${isNotPlayable ? "opacity-75" : ""}`}
+							title={
+								isNotPlayable
+									? card.type === "panic"
+										? "Panic cards can only be played automatically when you draw an Insta-Lose card"
+										: "You need a matching pair card to play this card"
+									: undefined
+							}
 						>
 							<span className="text-2xl">
 								{cardType?.icon || "?"}
@@ -71,6 +100,10 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 								<span className="text-xs font-medium text-center px-1">
 									{cardType?.name}
 								</span>
+							)}
+							{/* Visual indicator for unplayable cards */}
+							{isNotPlayable && (
+								<div className="absolute inset-0 rounded-xl border-2 border-red-400 border-dashed opacity-60" />
 							)}
 						</button>
 					);

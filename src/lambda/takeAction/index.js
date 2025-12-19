@@ -189,6 +189,37 @@ exports.handler = async (event) => {
 				const card = updatedGame.players[playerIndex].hand[cardIndex];
 				action.cardType = card.type;
 
+				// Validate card can be played
+				// Panic cards can only be auto-played when drawing insta-lose, not manually
+				if (card.type === "panic") {
+					return {
+						statusCode: 400,
+						headers,
+						body: JSON.stringify({
+							error: "Panic cards can only be played automatically when you draw an Insta-Lose card",
+						}),
+					};
+				}
+
+				// Pair cards can only be played if player has a matching pair
+				if (card.type.startsWith("pairs-")) {
+					const pairType = card.type;
+					const matchingPairs = updatedGame.players[
+						playerIndex
+					].hand.filter((c) => c.type === pairType);
+					
+					// Player must have at least 2 matching pairs (including the one they're trying to play)
+					if (matchingPairs.length < 2) {
+						return {
+							statusCode: 400,
+							headers,
+							body: JSON.stringify({
+								error: "You need a matching pair card to play this card",
+							}),
+						};
+					}
+				}
+
 				// Remove card from hand
 				updatedGame.players[playerIndex].hand.splice(cardIndex, 1);
 				updatedGame.discardPile.push(card);

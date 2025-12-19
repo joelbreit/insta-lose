@@ -146,6 +146,14 @@ function Game() {
 		const card = gameState.myHand.find((c) => c.id === cardId);
 		if (!card) return;
 
+		// Panic cards can only be auto-played when drawing insta-lose, not manually
+		if (card.type === "panic") {
+			setError(
+				"Panic cards can only be played automatically when you draw an Insta-Lose card"
+			);
+			return;
+		}
+
 		// Check if pairs card needs a target
 		if (card.type.startsWith("pairs-") && !targetPlayerId) {
 			// Check if player has a matching pair
@@ -155,6 +163,10 @@ function Game() {
 			if (matchingPairs.length >= 2) {
 				// Need to select a target - show target selection UI
 				setSelectedCard({ ...card, needsTarget: true });
+				return;
+			} else {
+				// Player doesn't have a matching pair
+				setError("You need a matching pair card to play this card");
 				return;
 			}
 		}
@@ -215,6 +227,26 @@ function Game() {
 		: gameState.players.filter(
 				(p) => p.playerId !== player?.playerId && p.isAlive
 		  );
+
+	// Check if a card is playable
+	const isCardPlayable = (card) => {
+		// Panic cards can only be auto-played when drawing insta-lose, not manually
+		if (card.type === "panic") {
+			return false;
+		}
+
+		// Pair cards can only be played if player has a matching pair
+		if (card.type.startsWith("pairs-")) {
+			const matchingPairs = gameState.myHand.filter(
+				(c) => c.type === card.type
+			);
+			// Player must have at least 2 matching pairs (including the one they're trying to play)
+			return matchingPairs.length >= 2;
+		}
+
+		// All other cards are playable
+		return true;
+	};
 
 	return (
 		<div
@@ -436,6 +468,7 @@ function Game() {
 					onSelectCard={setSelectedCard}
 					onPlayCard={handlePlayCard}
 					canPlay={isMyTurn && !isActing}
+					isCardPlayable={isCardPlayable}
 				/>
 			)}
 
