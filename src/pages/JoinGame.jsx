@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import PlayerSetup from "../components/PlayerSetup";
 import { generatePlayerId } from "../utils/gameUtils";
+import { joinGame } from "../services/api";
 
 function JoinGame() {
 	const navigate = useNavigate();
@@ -10,27 +11,48 @@ function JoinGame() {
 	const [playerName, setPlayerName] = useState("");
 	const [playerIcon, setPlayerIcon] = useState("🐶");
 	const [playerColor, setPlayerColor] = useState("bg-pink-500");
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState(null);
 
-	const handleJoinGame = () => {
+	const handleJoinGame = async () => {
 		if (!playerName.trim() || !gameId.trim()) return;
 
-		const playerId = generatePlayerId();
+		setIsLoading(true);
+		setError(null);
 
-		// Store player info in localStorage for now
-		localStorage.setItem(
-			"player",
-			JSON.stringify({
+		const playerId = generatePlayerId();
+		const normalizedGameId = gameId.toUpperCase();
+
+		try {
+			await joinGame(normalizedGameId, {
 				playerId,
 				name: playerName,
 				icon: playerIcon,
 				color: playerColor,
-				isHost: false,
-			})
-		);
+			});
 
-		// TODO: Call JoinGame API
-		// For now, just navigate to waiting room
-		navigate(`/waiting/${gameId.toUpperCase()}`);
+			// Store player info in localStorage
+			localStorage.setItem(
+				"player",
+				JSON.stringify({
+					playerId,
+					name: playerName,
+					icon: playerIcon,
+					color: playerColor,
+					isHost: false,
+				})
+			);
+
+			navigate(`/waiting/${normalizedGameId}`);
+		} catch (err) {
+			console.error("Failed to join game:", err);
+			setError(
+				err.message ||
+					"Failed to join game. Check the code and try again."
+			);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
 	return (
@@ -41,6 +63,12 @@ function JoinGame() {
 				<h1 className="text-3xl font-bold text-center mb-8">
 					Join a Game
 				</h1>
+
+				{error && (
+					<div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl text-center">
+						{error}
+					</div>
+				)}
 
 				<div className="mb-6">
 					<label className="block text-sm font-medium mb-2">
@@ -69,10 +97,12 @@ function JoinGame() {
 
 				<button
 					onClick={handleJoinGame}
-					disabled={!playerName.trim() || gameId.length < 4}
+					disabled={
+						!playerName.trim() || gameId.length < 4 || isLoading
+					}
 					className="w-full mt-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white text-xl font-semibold rounded-xl transition-colors"
 				>
-					Join Game
+					{isLoading ? "Joining..." : "Join Game"}
 				</button>
 			</main>
 		</div>

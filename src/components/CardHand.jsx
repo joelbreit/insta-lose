@@ -38,7 +38,11 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 			{/* Cards */}
 			<div className="flex gap-2 p-4 overflow-x-auto">
 				{cards.map((card) => {
-					const cardType = CARD_TYPES[card.type];
+					// Normalize card type (e.g., "pairs-A" -> "pairs")
+					const normalizedType = card.type?.startsWith("pairs-")
+						? "pairs"
+						: card.type;
+					const cardType = CARD_TYPES[normalizedType];
 					const isSelected = selectedCard?.id === card.id;
 
 					return (
@@ -48,16 +52,18 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 								onSelectCard(isSelected ? null : card)
 							}
 							className={`flex-shrink-0 w-20 h-28 rounded-xl flex flex-col items-center justify-center gap-1 transition-all ${
-								cardType.bgColor
-							} ${cardType.textColor} ${
+								cardType?.bgColor || "bg-slate-500"
+							} ${cardType?.textColor || "text-white"} ${
 								isSelected
 									? "ring-4 ring-indigo-500 scale-110 -translate-y-2"
 									: "hover:scale-105"
 							}`}
 						>
-							<span className="text-2xl">{cardType.icon}</span>
+							<span className="text-2xl">
+								{cardType?.icon || "?"}
+							</span>
 							<span className="text-xs font-medium text-center px-1">
-								{cardType.name}
+								{cardType?.name || card.type}
 							</span>
 						</button>
 					);
@@ -65,29 +71,37 @@ function CardHand({ cards, selectedCard, onSelectCard, onPlayCard, canPlay }) {
 			</div>
 
 			{/* Info modal */}
-			{showInfo && (
-				<div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-					<div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full">
-						<div className="flex items-center gap-3 mb-4">
-							<span className="text-4xl">
-								{CARD_TYPES[showInfo.type].icon}
-							</span>
-							<h3 className="text-xl font-bold">
-								{CARD_TYPES[showInfo.type].name}
-							</h3>
+			{showInfo &&
+				(() => {
+					const normalizedType = showInfo.type?.startsWith("pairs-")
+						? "pairs"
+						: showInfo.type;
+					const cardType = CARD_TYPES[normalizedType];
+					return (
+						<div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+							<div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full">
+								<div className="flex items-center gap-3 mb-4">
+									<span className="text-4xl">
+										{cardType?.icon || "?"}
+									</span>
+									<h3 className="text-xl font-bold">
+										{cardType?.name || showInfo.type}
+									</h3>
+								</div>
+								<p className="text-slate-600 dark:text-slate-300 mb-6">
+									{cardType?.description ||
+										"No description available."}
+								</p>
+								<button
+									onClick={() => setShowInfo(null)}
+									className="w-full py-3 bg-slate-200 dark:bg-slate-700 rounded-xl font-medium"
+								>
+									Close
+								</button>
+							</div>
 						</div>
-						<p className="text-slate-600 dark:text-slate-300 mb-6">
-							{CARD_TYPES[showInfo.type].description}
-						</p>
-						<button
-							onClick={() => setShowInfo(null)}
-							className="w-full py-3 bg-slate-200 dark:bg-slate-700 rounded-xl font-medium"
-						>
-							Close
-						</button>
-					</div>
-				</div>
-			)}
+					);
+				})()}
 		</div>
 	);
 }

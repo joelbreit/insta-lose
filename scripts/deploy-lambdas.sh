@@ -72,6 +72,32 @@ EOF
             --zip-file "fileb://${zip_file}" \
             --region "$REGION" > /dev/null
         
+        # Wait for code update to complete
+        echo "Waiting for code update to complete..."
+        local max_attempts=30
+        local attempt=0
+        while [ $attempt -lt $max_attempts ]; do
+            local status=$(aws lambda get-function \
+                --function-name "$lambda_name" \
+                --region "$REGION" \
+                --query 'Configuration.LastUpdateStatus' \
+                --output text 2>/dev/null)
+            
+            if [ "$status" = "Successful" ]; then
+                break
+            elif [ "$status" = "Failed" ]; then
+                echo "Error: Function update failed"
+                return 1
+            fi
+            
+            sleep 1
+            attempt=$((attempt + 1))
+        done
+        
+        if [ $attempt -eq $max_attempts ]; then
+            echo "Warning: Timeout waiting for function update, proceeding anyway..."
+        fi
+        
         # Update configuration
         aws lambda update-function-configuration \
             --function-name "$lambda_name" \

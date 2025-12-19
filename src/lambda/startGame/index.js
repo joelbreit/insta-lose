@@ -12,6 +12,8 @@ const TABLE_NAME = process.env.TABLE_NAME || "InstaLoseGames";
 
 const CARDS_PER_PLAYER = 5;
 const STARTING_HAND_SIZE = 7;
+// Minimum cards needed per player for initial hands (excluding panic card)
+const CARDS_FOR_INITIAL_HANDS = STARTING_HAND_SIZE - 1;
 
 // Card types for deck building
 const CARD_TYPES = {
@@ -41,7 +43,14 @@ function generateCardId() {
 function buildDeck(numPlayers) {
 	const cards = [];
 
-	// Add random cards (numPlayers * CARDS_PER_PLAYER)
+	// Calculate deck size:
+	// - Initial hands: numPlayers * CARDS_FOR_INITIAL_HANDS
+	// - Plus buffer for gameplay: numPlayers * CARDS_PER_PLAYER
+	// - Plus insta-lose cards: numPlayers - 1
+	const minCardsNeeded = numPlayers * CARDS_FOR_INITIAL_HANDS;
+	const bufferCards = numPlayers * CARDS_PER_PLAYER;
+	const totalRandomCards = minCardsNeeded + bufferCards;
+
 	const randomCardTypes = [
 		CARD_TYPES.PAIRS_A,
 		CARD_TYPES.PAIRS_A,
@@ -59,8 +68,8 @@ function buildDeck(numPlayers) {
 		CARD_TYPES.MISDEAL,
 	];
 
-	const numRandomCards = numPlayers * CARDS_PER_PLAYER;
-	for (let i = 0; i < numRandomCards; i++) {
+	// Add enough random cards to cover initial hands + gameplay buffer
+	for (let i = 0; i < totalRandomCards; i++) {
 		const type = randomCardTypes[i % randomCardTypes.length];
 		cards.push({
 			id: generateCardId(),
@@ -186,13 +195,42 @@ exports.handler = async (event) => {
 			updatedPlayers.map((p) => p.playerId)
 		);
 
+		// Ensure we have a valid first player
+		if (turnOrder.length === 0) {
+			return {
+				statusCode: 500,
+				headers,
+				body: JSON.stringify({ error: "Failed to create turn order" }),
+			};
+		}
+
+		const firstPlayerId = turnOrder[0];
+
+		// Verify the first player ID exists in updatedPlayers
+		const firstPlayerExists = updatedPlayers.some(
+			(p) => p.playerId === firstPlayerId
+		);
+
+		if (!firstPlayerExists) {
+			console.error("First player ID not found in updatedPlayers", {
+				firstPlayerId,
+				updatedPlayers: updatedPlayers.map((p) => p.playerId),
+			});
+			return {
+				statusCode: 500,
+				headers,
+				body: JSON.stringify({ error: "Invalid turn order" }),
+			};
+		}
+
 		const updatedGame = {
 			...game,
 			status: "in-progress",
 			players: updatedPlayers,
 			deck: remainingDeck,
+			discardPile: game.discardPile || [],
 			turnOrder,
-			currentTurnPlayerId: turnOrder[0],
+			currentTurnPlayerId: firstPlayerId,
 			updatedAt: Date.now(),
 			actions: [
 				{
