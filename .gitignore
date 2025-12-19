@@ -1,3 +1,22 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
+# Local env files
+*.local
+.env
+.env.*
+
+# AWS scripts output (contains account-specific ARNs/endpoints)
+scripts/output/
+
+# Lambda packaging artifacts
+src/lambda/*/node_modules
+src/lambda/*/*.zip
+
 # Logs
 logs
 *.log
@@ -7,18 +26,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
