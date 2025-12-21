@@ -252,33 +252,27 @@ function Game() {
 	};
 
 	return (
-		<div
-			className={`min-h-screen flex flex-col ${
-				isMyTurn && isAlive
-					? "bg-indigo-50 dark:bg-slate-900"
-					: "bg-slate-200 dark:bg-slate-950"
-			}`}
-		>
+		<div className="min-h-screen flex flex-col">
 			<Header />
 			{/* Top bar */}
-			<div className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3">
+			<div className="bg-gradient-to-b from-gray-800 to-black border-b-4 border-cyan-500 px-4 py-4">
 				<div className="flex justify-between items-center max-w-7xl mx-auto">
-					<div className="font-mono text-sm text-slate-500">
+					<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
 						{gameId}
 					</div>
-					<div className="flex items-center gap-4 text-sm">
-						<div className="flex items-center gap-1">
-							<Layers className="h-4 w-4 text-slate-400" />
-							<span className="font-semibold">
+					<div className="flex items-center gap-6 text-lg">
+						<div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-gray-700 to-gray-900 border-4 border-gray-600">
+							<Layers className="h-6 w-6 text-cyan-300" />
+							<span className="font-bold text-yellow-300 tracking-wide">
 								{gameState.deckCount}
 							</span>
 						</div>
 						<button
 							onClick={() => setShowGameState(true)}
-							className="flex items-center gap-1 px-3 py-1 bg-slate-100 dark:bg-slate-700 rounded-lg"
+							className="flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-blue-600 to-blue-800 border-4 border-blue-900 hover:from-blue-500 hover:to-blue-700"
 						>
-							<Users className="h-4 w-4" />
-							<span>
+							<Users className="h-6 w-6 text-cyan-300" />
+							<span className="font-bold text-yellow-300 tracking-wide">
 								{
 									gameState.players.filter((p) => p.isAlive)
 										.length
@@ -293,136 +287,134 @@ function Game() {
 			<div className="flex-1 flex flex-col p-4">
 				{/* Host spectator indicator */}
 				{isHost && (
-					<>
-						<div className="mb-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-center text-sm font-medium">
-							👁️ Spectator Mode - You're watching the game
-						</div>
-						{/* TODO: Add mute/unmute, next/previous track buttons */}
-						{/* <button
-							type="button"
-							className={`inline-block mx-auto mb-4 px-6 py-2 bg-slate-400 text-white rounded-full`}
-							onClick={() => {
-								isPlaying ? stop() : playGameMusic();
-							}}
-						>
-							<Music className="h-4 w-4" />
-							{isPlaying ? "Mute" : "Unmute"}
-						</button> */}
-					</>
+					<div className="mb-6 p-6 bg-gradient-to-b from-blue-900 to-blue-950 border-4 border-cyan-500 text-center">
+						<p className="text-2xl font-bold text-cyan-300 tracking-wide">👁️ SPECTATOR MODE - YOU'RE WATCHING THE GAME</p>
+					</div>
 				)}
 
 				{/* Error display */}
 				{error && (
-					<div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl text-center text-sm">
-						{error}
+					<div className="mb-6 p-6 bg-red-900 border-4 border-red-500 text-center">
+						<p className="text-xl font-bold text-yellow-300 tracking-wide">{error.toUpperCase()}</p>
 					</div>
 				)}
 
 				{/* Action result display */}
 				{actionResult && (
 					<div
-						className={`mb-4 p-4 rounded-xl text-center font-medium ${
+						className={`mb-6 p-6 border-4 text-center ${
 							actionResult.type === "eliminated"
-								? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300"
+								? "bg-red-900 border-red-500"
 								: actionResult.type === "saved"
-								? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
-								: "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+								? "bg-yellow-900 border-yellow-500"
+								: "bg-purple-900 border-purple-500"
 						}`}
 					>
-						{actionResult.message}
+						<p className="text-xl font-bold text-yellow-300 tracking-wide mb-3">{actionResult.message.toUpperCase()}</p>
 						<button
 							onClick={() => setActionResult(null)}
-							className="ml-2 underline text-sm"
+							className="px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold tracking-wide"
 						>
-							Dismiss
+							DISMISS
 						</button>
 					</div>
 				)}
 
 				{/* Peeked cards display */}
 				{peekedCards && (
-					<div className="mb-4 p-4 bg-cyan-100 dark:bg-cyan-900/30 rounded-xl">
-						<div className="text-center text-cyan-700 dark:text-cyan-300 font-medium mb-3">
-							👁️ Top 3 cards of the deck:
-						</div>
-						<div className="flex justify-center gap-2">
-							{peekedCards.map((card) => {
-								const normalizedType = card.type?.startsWith(
-									"pairs-"
-								)
-									? "pairs"
-									: card.type;
-								const cardType = CARD_TYPES[normalizedType];
-								return (
-									<div
-										key={card.id}
-										className={`w-16 h-24 rounded-lg flex flex-col items-center justify-center ${
-											cardType?.bgColor || "bg-slate-500"
-										} ${
-											cardType?.textColor || "text-white"
-										}`}
-									>
-										<span className="text-xl">
-											{cardType?.icon || "?"}
-										</span>
-										{card.type.startsWith("pairs-") ? (
-											<span className="text-xs font-medium text-center px-1">
-												{card.type.split("-")[1]}
+					<div className="mb-6 beveled-box">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-6">
+							<div className="text-center text-cyan-300 font-bold text-xl tracking-wide mb-6">
+								👁️ TOP 3 CARDS OF THE DECK:
+							</div>
+							<div className="flex justify-center gap-4">
+								{peekedCards.map((card) => {
+									const normalizedType = card.type?.startsWith(
+										"pairs-"
+									)
+										? "pairs"
+										: card.type;
+									const cardType = CARD_TYPES[normalizedType];
+									return (
+										<div
+											key={card.id}
+											className={`w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
+												cardType?.bgColor || "bg-slate-500"
+											} ${
+												cardType?.textColor || "text-white"
+											}`}
+											style={{ boxShadow: '0 4px 0 #000' }}
+										>
+											<span className="text-3xl">
+												{cardType?.icon || "?"}
 											</span>
-										) : (
-											<span className="text-xs font-medium text-center px-1">
-												{cardType?.name}
-											</span>
-										)}
-									</div>
-								);
-							})}
+											{card.type.startsWith("pairs-") ? (
+												<span className="text-sm font-bold text-center px-1 tracking-wide">
+													{card.type.split("-")[1]}
+												</span>
+											) : (
+												<span className="text-xs font-bold text-center px-1 tracking-wide">
+													{cardType?.name.toUpperCase()}
+												</span>
+											)}
+										</div>
+									);
+								})}
+							</div>
+							<button
+								onClick={() => setPeekedCards(null)}
+								className="block mx-auto mt-6 px-6 py-3 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold text-lg tracking-wide"
+							>
+								CLOSE
+							</button>
 						</div>
-						<button
-							onClick={() => setPeekedCards(null)}
-							className="block mx-auto mt-3 text-sm text-cyan-600 dark:text-cyan-400 underline"
-						>
-							Close
-						</button>
 					</div>
 				)}
 
 				{/* Turn indicator */}
-				<div className="text-center mb-6">
+				<div className="text-center mb-8">
 					{isHost ? (
-						<div className="inline-block px-6 py-2 bg-slate-400 text-white rounded-full">
-							{gameState.players.find(
-								(p) =>
-									p.playerId === gameState.currentTurnPlayerId
-							)?.name || "..."}
-							's turn
+						<div className="inline-block px-10 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900">
+							<span className="text-2xl font-bold text-cyan-300 tracking-wider">
+								{(gameState.players.find(
+									(p) =>
+										p.playerId === gameState.currentTurnPlayerId
+								)?.name || "...").toUpperCase()}'S TURN
+							</span>
 						</div>
 					) : !isAlive ? (
-						<div className="inline-block px-6 py-2 bg-red-500 text-white rounded-full font-semibold">
-							💀 Eliminated
+						<div className="inline-block px-10 py-4 bg-gradient-to-b from-red-600 to-red-800 border-4 border-red-900">
+							<span className="text-2xl font-bold text-yellow-300 tracking-wider">💀 ELIMINATED</span>
 						</div>
 					) : isMyTurn ? (
-						<div className="inline-block px-6 py-2 bg-indigo-600 text-white rounded-full font-semibold animate-pulse">
-							Your Turn!
+						<div className="inline-block px-10 py-4 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 animate-pulse">
+							<span className="text-2xl font-bold text-black tracking-wider">YOUR TURN!</span>
 						</div>
 					) : (
-						<div className="inline-block px-6 py-2 bg-slate-400 text-white rounded-full">
-							{gameState.players.find(
-								(p) =>
-									p.playerId === gameState.currentTurnPlayerId
-							)?.name || "..."}
-							's turn
+						<div className="inline-block px-10 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900">
+							<span className="text-2xl font-bold text-cyan-300 tracking-wider">
+								{(gameState.players.find(
+									(p) =>
+										p.playerId === gameState.currentTurnPlayerId
+								)?.name || "...").toUpperCase()}'S TURN
+							</span>
 						</div>
 					)}
 				</div>
 
 				{/* Player list (compact) */}
-				<div className="bg-white dark:bg-slate-800 rounded-xl p-4 mb-6">
-					<PlayerList
-						players={gameState.players}
-						currentTurnPlayerId={gameState.currentTurnPlayerId}
-						showCardCount
-					/>
+				<div className="beveled-box mb-8">
+					<div className="bevel-outer" />
+					<div className="bevel-inner" />
+					<div className="bevel-content p-6">
+						<PlayerList
+							players={gameState.players}
+							currentTurnPlayerId={gameState.currentTurnPlayerId}
+							showCardCount
+						/>
+					</div>
 				</div>
 
 				{/* Spacer */}
@@ -430,36 +422,40 @@ function Game() {
 
 				{/* Target selection for pairs - only for players */}
 				{!isHost && selectedCard?.needsTarget && (
-					<div className="mb-6 p-4 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
-						<div className="text-center text-purple-700 dark:text-purple-300 font-medium mb-3">
-							👯 Choose a player to steal from:
+					<div className="mb-8 beveled-box">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-6">
+							<div className="text-center text-yellow-300 font-bold text-2xl tracking-wide mb-6">
+								👯 CHOOSE A PLAYER TO STEAL FROM:
+							</div>
+							<div className="flex flex-wrap justify-center gap-4">
+								{otherAlivePlayers.map((p) => (
+									<button
+										key={p.playerId}
+										onClick={() =>
+											handlePlayCard(
+												selectedCard.id,
+												p.playerId
+											)
+										}
+										className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
+									>
+										<span className="text-2xl">{p.icon}</span>
+										<span className="font-bold text-xl text-cyan-300 tracking-wide">{p.name.toUpperCase()}</span>
+										<span className="text-lg text-yellow-300 font-bold">
+											({p.cardCount})
+										</span>
+									</button>
+								))}
+							</div>
+							<button
+								onClick={() => setSelectedCard(null)}
+								className="block mx-auto mt-6 px-6 py-3 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold text-lg tracking-wide"
+							>
+								CANCEL
+							</button>
 						</div>
-						<div className="flex flex-wrap justify-center gap-2">
-							{otherAlivePlayers.map((p) => (
-								<button
-									key={p.playerId}
-									onClick={() =>
-										handlePlayCard(
-											selectedCard.id,
-											p.playerId
-										)
-									}
-									className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800"
-								>
-									<span>{p.icon}</span>
-									<span>{p.name}</span>
-									<span className="text-xs text-slate-500">
-										({p.cardCount})
-									</span>
-								</button>
-							))}
-						</div>
-						<button
-							onClick={() => setSelectedCard(null)}
-							className="block mx-auto mt-3 text-sm text-purple-600 dark:text-purple-400 underline"
-						>
-							Cancel
-						</button>
 					</div>
 				)}
 
@@ -468,9 +464,14 @@ function Game() {
 					<button
 						onClick={handleDrawCard}
 						disabled={isActing}
-						className="mx-auto mb-6 px-12 py-4 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white text-xl font-bold rounded-2xl shadow-lg transition-transform hover:scale-105 disabled:hover:scale-100"
+						className="n64-button mx-auto mb-8 block"
 					>
-						{isActing ? "..." : "🎴 Draw Card"}
+						<div className="n64-button-shadow bg-gradient-to-b from-red-600 to-red-800" />
+						<div className="n64-button-face bg-gradient-to-b from-red-500 to-red-700 border-red-900 px-16 py-6 text-yellow-300">
+							<span className="text-3xl font-bold">
+								{isActing ? "..." : "🎴 DRAW CARD"}
+							</span>
+						</div>
 					</button>
 				)}
 			</div>
@@ -491,79 +492,83 @@ function Game() {
 
 			{/* Game state modal */}
 			{showGameState && (
-				<div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-					<div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-						<h3 className="text-xl font-bold mb-4">Game State</h3>
+				<div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+					<div className="beveled-box max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-8">
+							<h3 className="text-3xl font-bold mb-8 text-yellow-300 tracking-wider">GAME STATE</h3>
 
-						<div className="space-y-4">
-							<div>
-								<div className="text-sm text-slate-500 mb-1">
-									Deck
+							<div className="space-y-6">
+								<div className="p-4 bg-gray-900 border-4 border-gray-600">
+									<div className="text-lg text-cyan-300 font-bold tracking-wide mb-2">
+										DECK
+									</div>
+									<div className="font-bold text-2xl text-yellow-300">
+										{gameState.deckCount} CARDS REMAINING
+									</div>
 								</div>
-								<div className="font-semibold">
-									{gameState.deckCount} cards remaining
-								</div>
-							</div>
 
-							<div>
-								<div className="text-sm text-slate-500 mb-1">
-									Discard Pile
+								<div className="p-4 bg-gray-900 border-4 border-gray-600">
+									<div className="text-lg text-cyan-300 font-bold tracking-wide mb-2">
+										DISCARD PILE
+									</div>
+									<div className="font-bold text-2xl text-yellow-300">
+										{gameState.discardPileCount} CARDS
+									</div>
 								</div>
-								<div className="font-semibold">
-									{gameState.discardPileCount} cards
-								</div>
-							</div>
 
-							<div>
-								<div className="text-sm text-slate-500 mb-2">
-									Players
+								<div>
+									<div className="text-lg text-cyan-300 font-bold tracking-wide mb-4">
+										PLAYERS
+									</div>
+									<PlayerList
+										players={gameState.players}
+										currentTurnPlayerId={
+											gameState.currentTurnPlayerId
+										}
+										showCardCount
+									/>
 								</div>
-								<PlayerList
-									players={gameState.players}
-									currentTurnPlayerId={
-										gameState.currentTurnPlayerId
-									}
-									showCardCount
-								/>
-							</div>
 
-							<div>
-								<div className="text-sm text-slate-500 mb-2">
-									Recent Actions
-								</div>
-								<div className="space-y-1 text-sm">
-									{gameState.actions
-										.slice(-5)
-										.reverse()
-										.map((action, i) => {
-											const actionPlayer =
-												gameState.players.find(
-													(p) =>
-														p.playerId ===
-														action.playerId
+								<div>
+									<div className="text-lg text-cyan-300 font-bold tracking-wide mb-4">
+										RECENT ACTIONS
+									</div>
+									<div className="space-y-2">
+										{gameState.actions
+											.slice(-5)
+											.reverse()
+											.map((action, i) => {
+												const actionPlayer =
+													gameState.players.find(
+														(p) =>
+															p.playerId ===
+															action.playerId
+													);
+												return (
+													<div
+														key={i}
+														className="text-green-300 font-bold tracking-wide p-2 bg-gray-900 border-2 border-gray-700"
+													>
+														{(actionPlayer?.name || "?").toUpperCase()}:{" "}
+														{action.type.toUpperCase()}
+														{action.cardType &&
+															` (${action.cardType.toUpperCase()})`}
+													</div>
 												);
-											return (
-												<div
-													key={i}
-													className="text-slate-600 dark:text-slate-400"
-												>
-													{actionPlayer?.name || "?"}:{" "}
-													{action.type}
-													{action.cardType &&
-														` (${action.cardType})`}
-												</div>
-											);
-										})}
+											})}
+									</div>
 								</div>
 							</div>
-						</div>
 
-						<button
-							onClick={() => setShowGameState(false)}
-							className="w-full mt-6 py-3 bg-slate-200 dark:bg-slate-700 rounded-xl font-medium"
-						>
-							Close
-						</button>
+							<button
+								onClick={() => setShowGameState(false)}
+								className="w-full mt-8 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 font-bold text-xl text-yellow-300 tracking-wider"
+							>
+								CLOSE
+							</button>
+						</div>
 					</div>
 				</div>
 			)}
