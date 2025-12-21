@@ -285,140 +285,224 @@ function Game() {
 
 			{/* Main game area */}
 			<div className="flex-1 flex flex-col p-4">
-				{/* Host spectator indicator */}
-				{isHost && (
-					<div className="mb-6 p-6 bg-gradient-to-b from-blue-900 to-blue-950 border-4 border-cyan-500 text-center">
-						<p className="text-2xl font-bold text-cyan-300 tracking-wide">👁️ SPECTATOR MODE - YOU'RE WATCHING THE GAME</p>
-					</div>
-				)}
-
-				{/* Error display */}
-				{error && (
-					<div className="mb-6 p-6 bg-red-900 border-4 border-red-500 text-center">
-						<p className="text-xl font-bold text-yellow-300 tracking-wide">{error.toUpperCase()}</p>
-					</div>
-				)}
-
-				{/* Action result display */}
-				{actionResult && (
-					<div
-						className={`mb-6 p-6 border-4 text-center ${
-							actionResult.type === "eliminated"
-								? "bg-red-900 border-red-500"
-								: actionResult.type === "saved"
-								? "bg-yellow-900 border-yellow-500"
-								: "bg-purple-900 border-purple-500"
-						}`}
-					>
-						<p className="text-xl font-bold text-yellow-300 tracking-wide mb-3">{actionResult.message.toUpperCase()}</p>
-						<button
-							onClick={() => setActionResult(null)}
-							className="px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold tracking-wide"
-						>
-							DISMISS
-						</button>
-					</div>
-				)}
-
-				{/* Peeked cards display */}
-				{peekedCards && (
-					<div className="mb-6 beveled-box">
-						<div className="bevel-outer" />
-						<div className="bevel-inner" />
-						<div className="bevel-content p-6">
-							<div className="text-center text-cyan-300 font-bold text-xl tracking-wide mb-6">
-								👁️ TOP 3 CARDS OF THE DECK:
+				{/* SPECTATOR BILLBOARD VIEW - Only for Host */}
+				{isHost ? (
+					<div className="max-w-7xl mx-auto w-full space-y-6">
+						{/* Current Turn - HUGE */}
+						<div className="text-center mb-8">
+							<div className="inline-block px-16 py-8 bg-gradient-to-b from-yellow-600 to-yellow-800 border-8 border-yellow-900 animate-pulse">
+								<div className="text-5xl font-bold text-black tracking-wider mb-2">CURRENT TURN</div>
+								<div className="text-7xl font-bold text-black tracking-widest">
+									{(gameState.players.find(
+										(p) => p.playerId === gameState.currentTurnPlayerId
+									)?.name || "...").toUpperCase()}
+								</div>
 							</div>
-							<div className="flex justify-center gap-4">
-								{peekedCards.map((card) => {
-									const normalizedType = card.type?.startsWith(
-										"pairs-"
-									)
-										? "pairs"
-										: card.type;
-									const cardType = CARD_TYPES[normalizedType];
-									return (
-										<div
-											key={card.id}
-											className={`w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
-												cardType?.bgColor || "bg-slate-500"
-											} ${
-												cardType?.textColor || "text-white"
-											}`}
-											style={{ boxShadow: '0 4px 0 #000' }}
-										>
-											<span className="text-3xl">
-												{cardType?.icon || "?"}
-											</span>
-											{card.type.startsWith("pairs-") ? (
-												<span className="text-sm font-bold text-center px-1 tracking-wide">
-													{card.type.split("-")[1]}
-												</span>
-											) : (
-												<span className="text-xs font-bold text-center px-1 tracking-wide">
-													{cardType?.name.toUpperCase()}
-												</span>
-											)}
-										</div>
-									);
-								})}
+						</div>
+
+						{/* Game Stats - Two Column */}
+						<div className="grid grid-cols-2 gap-6">
+							{/* Draw Pile */}
+							<div className="beveled-box">
+								<div className="bevel-outer" />
+								<div className="bevel-inner" />
+								<div className="bevel-content p-8 text-center">
+									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">DRAW PILE</div>
+									<div className="text-8xl font-bold text-yellow-300 mb-4">{gameState.deckCount}</div>
+									<div className="text-4xl">🎴</div>
+								</div>
 							</div>
-							<button
-								onClick={() => setPeekedCards(null)}
-								className="block mx-auto mt-6 px-6 py-3 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold text-lg tracking-wide"
+
+							{/* Discard Pile */}
+							<div className="beveled-box">
+								<div className="bevel-outer" />
+								<div className="bevel-inner" />
+								<div className="bevel-content p-8 text-center">
+									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">DISCARD PILE</div>
+									<div className="text-8xl font-bold text-yellow-300 mb-4">{gameState.discardPileCount}</div>
+									<div className="text-4xl">🗑️</div>
+								</div>
+							</div>
+						</div>
+
+						{/* Players */}
+						<div className="beveled-box">
+							<div className="bevel-outer" />
+							<div className="bevel-inner" />
+							<div className="bevel-content p-8">
+								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">PLAYERS</div>
+								<PlayerList
+									players={gameState.players}
+									currentTurnPlayerId={gameState.currentTurnPlayerId}
+									showCardCount
+								/>
+							</div>
+						</div>
+
+						{/* Recent Actions - Activity Feed */}
+						<div className="beveled-box">
+							<div className="bevel-outer" />
+							<div className="bevel-inner" />
+							<div className="bevel-content p-8">
+								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">RECENT ACTIONS</div>
+								<div className="space-y-3">
+									{gameState.actions
+										.slice(-8)
+										.reverse()
+										.map((action, i) => {
+											const actionPlayer = gameState.players.find(
+												(p) => p.playerId === action.playerId
+											);
+											return (
+												<div
+													key={i}
+													className="flex items-center gap-4 p-4 bg-gray-900 border-4 border-gray-600"
+												>
+													{actionPlayer && (
+														<div className={`w-12 h-12 ${actionPlayer.color} border-4 border-black flex items-center justify-center text-2xl`}>
+															{actionPlayer.icon}
+														</div>
+													)}
+													<div className="flex-1">
+														<div className="text-2xl font-bold text-green-300 tracking-wide">
+															{(actionPlayer?.name || "?").toUpperCase()}: {action.type.toUpperCase()}
+														</div>
+														{action.cardType && (
+															<div className="text-xl text-yellow-300 font-bold tracking-wide">
+																{action.cardType.toUpperCase()}
+															</div>
+														)}
+													</div>
+												</div>
+											);
+										})}
+								</div>
+							</div>
+						</div>
+					</div>
+				) : (
+					<>
+						{/* PLAYER VIEW */}
+						{/* Error display */}
+						{error && (
+							<div className="mb-6 p-6 bg-red-900 border-4 border-red-500 text-center">
+								<p className="text-xl font-bold text-yellow-300 tracking-wide">{error.toUpperCase()}</p>
+							</div>
+						)}
+
+						{/* Action result display */}
+						{actionResult && (
+							<div
+								className={`mb-6 p-6 border-4 text-center ${
+									actionResult.type === "eliminated"
+										? "bg-red-900 border-red-500"
+										: actionResult.type === "saved"
+										? "bg-yellow-900 border-yellow-500"
+										: "bg-purple-900 border-purple-500"
+								}`}
 							>
-								CLOSE
-							</button>
+								<p className="text-xl font-bold text-yellow-300 tracking-wide mb-3">{actionResult.message.toUpperCase()}</p>
+								<button
+									onClick={() => setActionResult(null)}
+									className="px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold tracking-wide"
+								>
+									DISMISS
+								</button>
+							</div>
+						)}
+
+						{/* Peeked cards display */}
+						{peekedCards && (
+							<div className="mb-6 beveled-box">
+								<div className="bevel-outer" />
+								<div className="bevel-inner" />
+								<div className="bevel-content p-6">
+									<div className="text-center text-cyan-300 font-bold text-xl tracking-wide mb-6">
+										👁️ TOP 3 CARDS OF THE DECK:
+									</div>
+									<div className="flex justify-center gap-4">
+										{peekedCards.map((card) => {
+											const normalizedType = card.type?.startsWith(
+												"pairs-"
+											)
+												? "pairs"
+												: card.type;
+											const cardType = CARD_TYPES[normalizedType];
+											return (
+												<div
+													key={card.id}
+													className={`w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
+														cardType?.bgColor || "bg-slate-500"
+													} ${
+														cardType?.textColor || "text-white"
+													}`}
+													style={{ boxShadow: '0 4px 0 #000' }}
+												>
+													<span className="text-3xl">
+														{cardType?.icon || "?"}
+													</span>
+													{card.type.startsWith("pairs-") ? (
+														<span className="text-sm font-bold text-center px-1 tracking-wide">
+															{card.type.split("-")[1]}
+														</span>
+													) : (
+														<span className="text-xs font-bold text-center px-1 tracking-wide">
+															{cardType?.name.toUpperCase()}
+														</span>
+													)}
+												</div>
+											);
+										})}
+									</div>
+									<button
+										onClick={() => setPeekedCards(null)}
+										className="block mx-auto mt-6 px-6 py-3 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold text-lg tracking-wide"
+									>
+										CLOSE
+									</button>
+								</div>
+							</div>
+						)}
+
+						{/* Turn indicator */}
+						<div className="text-center mb-8">
+							{!isAlive ? (
+								<div className="inline-block px-10 py-4 bg-gradient-to-b from-red-600 to-red-800 border-4 border-red-900">
+									<span className="text-2xl font-bold text-yellow-300 tracking-wider">💀 ELIMINATED</span>
+								</div>
+							) : isMyTurn ? (
+								<div className="inline-block px-10 py-4 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 animate-pulse">
+									<span className="text-2xl font-bold text-black tracking-wider">YOUR TURN!</span>
+								</div>
+							) : (
+								<div className="inline-block px-10 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900">
+									<span className="text-2xl font-bold text-cyan-300 tracking-wider">
+										{(gameState.players.find(
+											(p) =>
+												p.playerId === gameState.currentTurnPlayerId
+										)?.name || "...").toUpperCase()}'S TURN
+									</span>
+								</div>
+							)}
 						</div>
-					</div>
+
+						{/* Player list (compact) */}
+						<div className="beveled-box mb-8">
+							<div className="bevel-outer" />
+							<div className="bevel-inner" />
+							<div className="bevel-content p-6">
+								<PlayerList
+									players={gameState.players}
+									currentTurnPlayerId={gameState.currentTurnPlayerId}
+									showCardCount
+								/>
+							</div>
+						</div>
+
+						{/* Spacer */}
+						<div className="flex-1" />
+					</>
 				)}
-
-				{/* Turn indicator */}
-				<div className="text-center mb-8">
-					{isHost ? (
-						<div className="inline-block px-10 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900">
-							<span className="text-2xl font-bold text-cyan-300 tracking-wider">
-								{(gameState.players.find(
-									(p) =>
-										p.playerId === gameState.currentTurnPlayerId
-								)?.name || "...").toUpperCase()}'S TURN
-							</span>
-						</div>
-					) : !isAlive ? (
-						<div className="inline-block px-10 py-4 bg-gradient-to-b from-red-600 to-red-800 border-4 border-red-900">
-							<span className="text-2xl font-bold text-yellow-300 tracking-wider">💀 ELIMINATED</span>
-						</div>
-					) : isMyTurn ? (
-						<div className="inline-block px-10 py-4 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 animate-pulse">
-							<span className="text-2xl font-bold text-black tracking-wider">YOUR TURN!</span>
-						</div>
-					) : (
-						<div className="inline-block px-10 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900">
-							<span className="text-2xl font-bold text-cyan-300 tracking-wider">
-								{(gameState.players.find(
-									(p) =>
-										p.playerId === gameState.currentTurnPlayerId
-								)?.name || "...").toUpperCase()}'S TURN
-							</span>
-						</div>
-					)}
-				</div>
-
-				{/* Player list (compact) */}
-				<div className="beveled-box mb-8">
-					<div className="bevel-outer" />
-					<div className="bevel-inner" />
-					<div className="bevel-content p-6">
-						<PlayerList
-							players={gameState.players}
-							currentTurnPlayerId={gameState.currentTurnPlayerId}
-							showCardCount
-						/>
-					</div>
-				</div>
-
-				{/* Spacer */}
-				<div className="flex-1" />
 
 				{/* Target selection for pairs - only for players */}
 				{!isHost && selectedCard?.needsTarget && (
