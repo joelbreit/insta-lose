@@ -3,62 +3,74 @@ import { CARD_TYPES } from "../utils/cardTypes";
 
 function About() {
 	return (
-		<div className="min-h-screen bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+		<div className="min-h-screen">
 			<Header />
 
-			<main className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-				<h1 className="text-3xl font-bold mb-6">How to Play</h1>
+			<main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+				<h1 className="text-5xl font-bold mb-12 text-center text-yellow-300">HOW TO PLAY</h1>
 
-				<div className="space-y-6 text-slate-600 dark:text-slate-300">
-					<section>
-						<h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-							Goal
-						</h2>
-						<p>
-							Be the last player standing! Avoid drawing the
-							Insta-Lose cards at all costs.
-						</p>
+				<div className="space-y-8">
+					<section className="beveled-box p-6">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-6">
+							<h2 className="text-2xl font-bold text-cyan-300 mb-4">
+								GOAL
+							</h2>
+							<p className="text-lg text-green-300 tracking-wide">
+								BE THE LAST PLAYER STANDING! AVOID DRAWING THE
+								INSTA-LOSE CARDS AT ALL COSTS.
+							</p>
+						</div>
 					</section>
 
-					<section>
-						<h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-							On Your Turn
-						</h2>
-						<ol className="list-decimal list-inside space-y-1">
-							<li>Play any cards you want (optional)</li>
-							<li>Draw a card to end your turn</li>
-							<li>
-								If you draw an Insta-Lose card, play a Panic
-								card or you're out!
-							</li>
-						</ol>
+					<section className="beveled-box p-6">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-6">
+							<h2 className="text-2xl font-bold text-cyan-300 mb-4">
+								ON YOUR TURN
+							</h2>
+							<ol className="list-decimal list-inside space-y-3 text-lg text-green-300 tracking-wide">
+								<li>PLAY ANY CARDS YOU WANT (OPTIONAL)</li>
+								<li>DRAW A CARD TO END YOUR TURN</li>
+								<li>
+									IF YOU DRAW AN INSTA-LOSE CARD, PLAY A PANIC
+									CARD OR YOU'RE OUT!
+								</li>
+							</ol>
+						</div>
 					</section>
 
-					<section>
-						<h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
-							Card Types
-						</h2>
-						<div className="grid gap-3">
-							{Object.entries(CARD_TYPES).map(([key, card]) => (
-								<div
-									key={key}
-									className="flex items-start gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-xl"
-								>
+					<section className="beveled-box p-6">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-6">
+							<h2 className="text-2xl font-bold text-cyan-300 mb-6">
+								CARD TYPES
+							</h2>
+							<div className="grid gap-4">
+								{Object.entries(CARD_TYPES).map(([key, card]) => (
 									<div
-										className={`w-12 h-16 ${card.bgColor} rounded-lg flex items-center justify-center text-2xl flex-shrink-0`}
+										key={key}
+										className="flex items-start gap-4 p-4 bg-gray-900 border-4 border-gray-600"
 									>
-										{card.icon}
-									</div>
-									<div>
-										<div className="font-semibold">
-											{card.name}
+										<div
+											className={`w-16 h-20 ${card.bgColor} border-4 border-black flex items-center justify-center text-3xl flex-shrink-0`}
+										>
+											{card.icon}
 										</div>
-										<div className="text-sm">
-											{card.description}
+										<div>
+											<div className="font-bold text-xl text-yellow-300 tracking-wide mb-1">
+												{card.name.toUpperCase()}
+											</div>
+											<div className="text-base text-cyan-200 tracking-wide">
+												{card.description.toUpperCase()}
+											</div>
 										</div>
 									</div>
-								</div>
-							))}
+								))}
+							</div>
 						</div>
 					</section>
 				</div>

@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+/* N64 Aesthetic - Global Styles */
+@layer base {
+  * {
+    font-family: 'Impact', 'Arial Black', sans-serif;
+  }
+
+  body {
+    background: linear-gradient(to bottom right, #1e1b4b, #581c87, #000000);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    text-shadow: 3px 3px 0px #000;
+  }
+
+  button {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: bold;
+  }
+}

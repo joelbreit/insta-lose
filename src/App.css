@@ -1,42 +1,93 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* N64 Aesthetic - CRT Effects & Utilities */
+
+/* Scanlines overlay */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.1) 2px,
+    rgba(255, 255, 255, 0.1) 4px
+  );
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Grid background */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image:
+    linear-gradient(#00FFFF 1px, transparent 1px),
+    linear-gradient(90deg, #00FFFF 1px, transparent 1px);
+  background-size: 50px 50px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Pixelated stars */
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.card {
-  padding: 2em;
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #fff;
+  box-shadow: 0 0 2px #fff;
 }
 
-.read-the-docs {
-  color: #888;
+/* N64 3D Button */
+.n64-button {
+  position: relative;
+  display: inline-block;
+}
+
+.n64-button-shadow {
+  position: absolute;
+  inset: 0;
+  transform: translateY(6px);
+  border-radius: 0;
+}
+
+.n64-button-face {
+  position: relative;
+  border: 4px solid;
+  transition: transform 150ms;
+}
+
+.n64-button:hover .n64-button-face {
+  transform: translateY(4px);
+}
+
+.n64-button:active .n64-button-face {
+  transform: translateY(6px);
+}
+
+/* 3D Beveled Box */
+.beveled-box {
+  position: relative;
+}
+
+.bevel-outer {
+  position: absolute;
+  inset: -8px;
+  background: linear-gradient(to bottom right, #9ca3af, #4b5563);
+}
+
+.bevel-inner {
+  position: absolute;
+  inset: -4px;
+  background: linear-gradient(to bottom right, #374151, #111827);
+}
+
+.bevel-content {
+  position: relative;
+  background: linear-gradient(to bottom, #1f2937, #000000);
+  border: 4px solid #4b5563;
 }

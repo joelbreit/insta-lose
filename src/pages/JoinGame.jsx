@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import PlayerSetup from "../components/PlayerSetup";
+import N64Button from "../components/N64Button";
 import { generatePlayerId } from "../utils/gameUtils";
 import { joinGame } from "../services/api";
 
@@ -56,34 +57,38 @@ function JoinGame() {
 	};
 
 	return (
-		<div className="min-h-screen bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+		<div className="min-h-screen">
 			<Header />
 
-			<main className="mx-auto max-w-md px-4 py-8">
-				<h1 className="text-3xl font-bold text-center mb-8">
-					Join a Game
+			<main className="mx-auto max-w-2xl px-4 py-12">
+				<h1 className="text-5xl font-bold text-center mb-12 text-yellow-300">
+					JOIN A GAME
 				</h1>
 
 				{error && (
-					<div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl text-center">
-						{error}
+					<div className="mb-8 p-6 bg-red-900 border-4 border-red-500 text-yellow-300 text-center text-xl font-bold tracking-wide">
+						{error.toUpperCase()}
 					</div>
 				)}
 
-				<div className="mb-6">
-					<label className="block text-sm font-medium mb-2">
-						Game Code
-					</label>
-					<input
-						type="text"
-						value={gameId}
-						onChange={(e) =>
-							setGameId(e.target.value.toUpperCase())
-						}
-						placeholder="XRAY42"
-						maxLength={6}
-						className="w-full px-4 py-3 text-2xl text-center tracking-widest font-mono bg-slate-100 dark:bg-slate-800 rounded-xl border-2 border-transparent focus:border-indigo-500 outline-none"
-					/>
+				<div className="mb-8 beveled-box">
+					<div className="bevel-outer" />
+					<div className="bevel-inner" />
+					<div className="bevel-content p-6">
+						<label className="block text-lg font-bold mb-4 text-cyan-300 tracking-wide">
+							GAME CODE
+						</label>
+						<input
+							type="text"
+							value={gameId}
+							onChange={(e) =>
+								setGameId(e.target.value.toUpperCase())
+							}
+							placeholder="XRAY42"
+							maxLength={6}
+							className="w-full px-6 py-4 text-3xl text-center tracking-widest font-mono bg-black border-4 border-cyan-500 text-yellow-300 outline-none focus:border-yellow-300"
+						/>
+					</div>
 				</div>
 
 				<PlayerSetup
@@ -95,15 +100,20 @@ function JoinGame() {
 					setColor={setPlayerColor}
 				/>
 
-				<button
-					onClick={handleJoinGame}
-					disabled={
-						!playerName.trim() || gameId.length < 4 || isLoading
-					}
-					className="w-full mt-8 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white text-xl font-semibold rounded-xl transition-colors"
-				>
-					{isLoading ? "Joining..." : "Join Game"}
-				</button>
+				<div className="flex justify-center mt-10">
+					<N64Button
+						onClick={handleJoinGame}
+						disabled={
+							!playerName.trim() || gameId.length < 4 || isLoading
+						}
+						color="green"
+						className="w-full max-w-md"
+					>
+						<span className="text-2xl py-2">
+							{isLoading ? "JOINING..." : "JOIN GAME"}
+						</span>
+					</N64Button>
+				</div>
 			</main>
 		</div>
 	);

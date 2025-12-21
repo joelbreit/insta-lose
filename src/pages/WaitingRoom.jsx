@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import PlayerList from "../components/PlayerList";
+import N64Button from "../components/N64Button";
 import { Copy, Check, RefreshCw } from "lucide-react";
 import { getGameState, startGame } from "../services/api";
 
@@ -130,107 +131,120 @@ function WaitingRoom() {
 	const canStart = players.length >= 2;
 
 	return (
-		<div className="min-h-screen bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+		<div className="min-h-screen">
 			<Header />
 
-			<main className="mx-auto max-w-md px-4 py-8">
-				<div className="text-center mb-8">
-					<p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
-						Game Code
+			<main className="mx-auto max-w-2xl px-4 py-12">
+				<div className="text-center mb-12">
+					<p className="text-lg text-cyan-300 mb-4 font-bold tracking-wider">
+						GAME CODE
 					</p>
-					<div className="flex items-center justify-center gap-3">
-						<span className="text-4xl font-mono font-bold tracking-widest">
-							{gameId}
-						</span>
-						<button
-							onClick={copyGameCode}
-							className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
-							title="Copy game code"
-						>
-							{copied ? (
-								<Check className="h-5 w-5 text-green-500" />
-							) : (
-								<Copy className="h-5 w-5" />
-							)}
-						</button>
+					<div className="beveled-box inline-block">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div className="bevel-content p-6 flex items-center gap-4">
+							<span className="text-5xl font-mono font-bold tracking-widest text-yellow-300">
+								{gameId}
+							</span>
+							<button
+								onClick={copyGameCode}
+								className="p-3 bg-gradient-to-b from-blue-600 to-blue-800 border-4 border-blue-900 hover:from-blue-500 hover:to-blue-700 text-cyan-300"
+								title="Copy game code"
+							>
+								{copied ? (
+									<Check className="h-6 w-6 text-green-300" />
+								) : (
+									<Copy className="h-6 w-6" />
+								)}
+							</button>
+						</div>
 					</div>
 				</div>
 
 				{error && (
-					<div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-xl text-center">
-						{error}
+					<div className="mb-8 p-6 bg-red-900 border-4 border-red-500 text-yellow-300 text-center text-xl font-bold tracking-wide">
+						{error.toUpperCase()}
 						<button
 							onClick={handleRefresh}
-							className="ml-2 underline hover:no-underline"
+							className="ml-4 px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-2 border-gray-900 hover:from-gray-500 hover:to-gray-700"
 						>
-							Retry
+							RETRY
 						</button>
 					</div>
 				)}
 
-				<div className="bg-slate-100 dark:bg-slate-800 rounded-2xl p-6 mb-6">
-					<div className="flex items-center justify-between mb-4">
-						<h2 className="text-lg font-semibold">
-							Players ({players.length})
-						</h2>
-						<button
-							onClick={handleRefresh}
-							className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700"
-							title="Refresh player list"
-						>
-							<RefreshCw className="h-4 w-4" />
-						</button>
+				<div className="beveled-box mb-10">
+					<div className="bevel-outer" />
+					<div className="bevel-inner" />
+					<div className="bevel-content p-8">
+						<div className="flex items-center justify-between mb-6">
+							<h2 className="text-2xl font-bold text-cyan-300 tracking-wider">
+								PLAYERS ({players.length})
+							</h2>
+							<button
+								onClick={handleRefresh}
+								className="p-3 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 hover:from-gray-500 hover:to-gray-700 text-cyan-300"
+								title="Refresh player list"
+							>
+								<RefreshCw className="h-5 w-5" />
+							</button>
+						</div>
+						{players.length === 0 ? (
+							<p className="text-green-300 text-center py-8 text-xl tracking-wide">
+								WAITING FOR PLAYERS TO JOIN...
+							</p>
+						) : (
+							<PlayerList players={players} />
+						)}
 					</div>
-					{players.length === 0 ? (
-						<p className="text-slate-500 dark:text-slate-400 text-center py-4">
-							Waiting for players to join...
-						</p>
-					) : (
-						<PlayerList players={players} />
-					)}
 				</div>
 
-				<div className="text-center text-slate-500 dark:text-slate-400 mb-6">
+				<div className="text-center text-yellow-300 mb-8 text-xl font-bold tracking-wide">
 					{isHost ? (
 						players.length === 0 ? (
-							<p>Waiting for players to join...</p>
+							<p>WAITING FOR PLAYERS TO JOIN...</p>
 						) : players.length < 2 ? (
 							<p>
-								{players.length} player joined. Need at least 2
-								players to start.
+								{players.length} PLAYER JOINED. NEED AT LEAST 2
+								PLAYERS TO START.
 							</p>
 						) : (
 							<p>
-								Waiting for {players[0]?.name} to start the
-								game...
+								WAITING FOR {players[0]?.name.toUpperCase()} TO START THE
+								GAME...
 							</p>
 						)
 					) : players.length < 2 ? (
-						<p>Need at least 2 players to start</p>
+						<p>NEED AT LEAST 2 PLAYERS TO START</p>
 					) : isMVP ? (
-						<p>You're the MVP! Start when everyone's ready.</p>
+						<p>YOU'RE THE MVP! START WHEN EVERYONE'S READY.</p>
 					) : (
 						<p>
-							Waiting for {players[0]?.name} to start the game...
+							WAITING FOR {players[0]?.name.toUpperCase()} TO START THE GAME...
 						</p>
 					)}
 				</div>
 
 				{isMVP && (
-					<button
-						onClick={handleStartGame}
-						disabled={!canStart || isStarting}
-						className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white text-xl font-semibold rounded-xl transition-colors"
-					>
-						{isStarting ? "Starting..." : "Start Game"}
-					</button>
+					<div className="flex justify-center">
+						<N64Button
+							onClick={handleStartGame}
+							disabled={!canStart || isStarting}
+							color="purple"
+							className="w-full max-w-md"
+						>
+							<span className="text-2xl py-2">
+								{isStarting ? "STARTING..." : "START GAME"}
+							</span>
+						</N64Button>
+					</div>
 				)}
 
 				{!isMVP && players.length >= 2 && (
-					<div className="text-center text-sm text-slate-400">
-						<div className="flex items-center justify-center gap-2">
-							<div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-							Game will start soon...
+					<div className="text-center">
+						<div className="flex items-center justify-center gap-3 text-green-300 text-xl font-bold tracking-wide">
+							<div className="w-4 h-4 bg-green-500 border-2 border-green-300 animate-pulse" />
+							GAME WILL START SOON...
 						</div>
 					</div>
 				)}

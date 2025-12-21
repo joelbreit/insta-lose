@@ -12,74 +12,92 @@ const COLORS = [
 
 function PlayerSetup({ name, setName, icon, setIcon, color, setColor }) {
 	return (
-		<div className="space-y-6">
+		<div className="space-y-8">
 			{/* Name input */}
-			<div>
-				<label className="block text-sm font-medium mb-2">
-					Your Name
-				</label>
-				<input
-					type="text"
-					value={name}
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Enter your name"
-					maxLength={12}
-					className="w-full px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl border-2 border-transparent focus:border-indigo-500 outline-none"
-				/>
+			<div className="beveled-box">
+				<div className="bevel-outer" />
+				<div className="bevel-inner" />
+				<div className="bevel-content p-6">
+					<label className="block text-lg font-bold mb-4 text-cyan-300 tracking-wide">
+						YOUR NAME
+					</label>
+					<input
+						type="text"
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+						placeholder="ENTER NAME"
+						maxLength={12}
+						className="w-full px-6 py-4 text-xl bg-black border-4 border-cyan-500 text-yellow-300 tracking-wide outline-none focus:border-yellow-300 placeholder:text-gray-600"
+					/>
+				</div>
 			</div>
 
 			{/* Icon selector */}
-			<div>
-				<label className="block text-sm font-medium mb-2">
-					Choose Icon
-				</label>
-				<div className="grid grid-cols-6 gap-2">
-					{ICONS.map((i) => (
-						<button
-							key={i}
-							onClick={() => setIcon(i)}
-							className={`p-3 text-2xl rounded-xl transition-all ${
-								icon === i
-									? "bg-indigo-100 dark:bg-indigo-900 ring-2 ring-indigo-500"
-									: "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700"
-							}`}
-						>
-							{i}
-						</button>
-					))}
+			<div className="beveled-box">
+				<div className="bevel-outer" />
+				<div className="bevel-inner" />
+				<div className="bevel-content p-6">
+					<label className="block text-lg font-bold mb-4 text-cyan-300 tracking-wide">
+						CHOOSE ICON
+					</label>
+					<div className="grid grid-cols-6 gap-3">
+						{ICONS.map((i) => (
+							<button
+								key={i}
+								onClick={() => setIcon(i)}
+								className={`p-4 text-3xl transition-all border-4 ${
+									icon === i
+										? "bg-yellow-500 border-yellow-300 ring-4 ring-cyan-500"
+										: "bg-gray-800 border-gray-600 hover:border-cyan-600"
+								}`}
+							>
+								{i}
+							</button>
+						))}
+					</div>
 				</div>
 			</div>
 
 			{/* Color selector */}
-			<div>
-				<label className="block text-sm font-medium mb-2">
-					Choose Color
-				</label>
-				<div className="grid grid-cols-4 gap-2">
-					{COLORS.map((c) => (
-						<button
-							key={c}
-							onClick={() => setColor(c)}
-							className={`h-12 rounded-xl transition-all ${c} ${
-								color === c
-									? "ring-2 ring-offset-2 ring-slate-900 dark:ring-white"
-									: "hover:opacity-80"
-							}`}
-						/>
-					))}
+			<div className="beveled-box">
+				<div className="bevel-outer" />
+				<div className="bevel-inner" />
+				<div className="bevel-content p-6">
+					<label className="block text-lg font-bold mb-4 text-cyan-300 tracking-wide">
+						CHOOSE COLOR
+					</label>
+					<div className="grid grid-cols-4 gap-3">
+						{COLORS.map((c) => (
+							<button
+								key={c}
+								onClick={() => setColor(c)}
+								className={`h-16 transition-all border-4 border-black ${c} ${
+									color === c
+										? "ring-4 ring-cyan-500"
+										: "hover:opacity-80"
+								}`}
+							/>
+						))}
+					</div>
 				</div>
 			</div>
 
 			{/* Preview */}
-			<div className="flex items-center justify-center gap-3 p-4 bg-slate-100 dark:bg-slate-800 rounded-xl">
-				<div
-					className={`w-12 h-12 ${color} rounded-full flex items-center justify-center text-2xl`}
-				>
-					{icon}
+			<div className="beveled-box">
+				<div className="bevel-outer" />
+				<div className="bevel-inner" />
+				<div className="bevel-content p-6">
+					<div className="flex items-center justify-center gap-4 p-6 bg-black border-4 border-gray-600">
+						<div
+							className={`w-16 h-16 ${color} border-4 border-black flex items-center justify-center text-3xl`}
+						>
+							{icon}
+						</div>
+						<span className="font-bold text-2xl text-yellow-300 tracking-wide">
+							{name || "YOUR NAME"}
+						</span>
+					</div>
 				</div>
-				<span className="font-semibold text-lg">
-					{name || "Your Name"}
-				</span>
 			</div>
 		</div>
 	);

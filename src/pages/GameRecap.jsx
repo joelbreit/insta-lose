@@ -51,12 +51,12 @@ function GameRecap() {
 
 	if (error) {
 		return (
-			<div className="min-h-screen bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+			<div className="min-h-screen">
 				<Header />
-				<main className="mx-auto max-w-md px-4 py-8 text-center">
-					<p className="text-red-500 mb-4">{error}</p>
-					<Link to="/" className="text-indigo-600 hover:underline">
-						Return Home
+				<main className="mx-auto max-w-2xl px-4 py-16 text-center">
+					<p className="text-red-400 text-2xl font-bold tracking-wide mb-8">{error.toUpperCase()}</p>
+					<Link to="/" className="text-cyan-300 text-xl font-bold tracking-wide hover:text-cyan-400">
+						RETURN HOME
 					</Link>
 				</main>
 			</div>
@@ -65,10 +65,10 @@ function GameRecap() {
 
 	if (!gameState) {
 		return (
-			<div className="min-h-screen bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+			<div className="min-h-screen">
 				<Header />
-				<main className="mx-auto max-w-md px-4 py-8 text-center">
-					<p className="text-slate-500">Loading results...</p>
+				<main className="mx-auto max-w-2xl px-4 py-16 text-center">
+					<p className="text-yellow-300 text-2xl font-bold tracking-wide">LOADING RESULTS...</p>
 				</main>
 			</div>
 		);
@@ -93,29 +93,35 @@ function GameRecap() {
 	const isWinner = !isHost && player?.playerId === gameState.winnerId;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-indigo-100 to-white dark:from-slate-900 dark:to-slate-800 text-slate-900 dark:text-white">
+		<div className="min-h-screen">
 			<Header />
 
-			<main className="mx-auto max-w-md px-4 py-8">
+			<main className="mx-auto max-w-3xl px-4 py-12">
 				{/* Winner announcement */}
-				<div className="text-center mb-8">
-					<div className="text-6xl mb-4">🏆</div>
-					<h1 className="text-3xl font-bold mb-2">Game Over!</h1>
+				<div className="text-center mb-12">
+					<div className="text-8xl mb-6">🏆</div>
+					<h1 className="text-6xl font-bold mb-8 text-yellow-300">GAME OVER!</h1>
 					{winner && (
-						<div className="flex items-center justify-center gap-3 mt-4 p-4 bg-amber-100 dark:bg-amber-900/30 rounded-xl">
-							<div
-								className={`w-12 h-12 ${winner.color} rounded-full flex items-center justify-center text-xl`}
-							>
-								{winner.icon}
-							</div>
-							<div>
-								<div className="font-bold text-lg">
-									{isWinner
-										? "You won!"
-										: `${winner.name} wins!`}
-								</div>
-								<div className="text-sm text-amber-600 dark:text-amber-400">
-									Last player standing
+						<div className="beveled-box inline-block">
+							<div className="bevel-outer" />
+							<div className="bevel-inner" />
+							<div className="bevel-content p-8">
+								<div className="flex items-center gap-6">
+									<div
+										className={`w-20 h-20 ${winner.color} border-4 border-black flex items-center justify-center text-4xl`}
+									>
+										{winner.icon}
+									</div>
+									<div className="text-left">
+										<div className="font-bold text-3xl text-cyan-300 tracking-wider mb-2">
+											{isWinner
+												? "YOU WON!"
+												: `${winner.name.toUpperCase()} WINS!`}
+										</div>
+										<div className="text-xl text-green-300 font-bold tracking-wide">
+											LAST PLAYER STANDING
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -123,100 +129,104 @@ function GameRecap() {
 				</div>
 
 				{/* Player rankings */}
-				<div className="bg-white dark:bg-slate-800 rounded-2xl p-6 mb-6">
-					<h2 className="text-lg font-semibold mb-4">
-						Final Standings
-					</h2>
-					<div className="space-y-3">
-						{sortedPlayers.map((p, index) => {
-							const isPlayerWinner =
-								p.playerId === gameState.winnerId;
-							const rank = index + 1;
+				<div className="beveled-box mb-10">
+					<div className="bevel-outer" />
+					<div className="bevel-inner" />
+					<div className="bevel-content p-8">
+						<h2 className="text-3xl font-bold mb-6 text-cyan-300 tracking-wider">
+							FINAL STANDINGS
+						</h2>
+						<div className="space-y-4">
+							{sortedPlayers.map((p, index) => {
+								const isPlayerWinner =
+									p.playerId === gameState.winnerId;
+								const rank = index + 1;
 
-							return (
-								<div
-									key={p.playerId}
-									className={`flex items-center gap-3 p-3 rounded-xl ${
-										isPlayerWinner
-											? "bg-amber-50 dark:bg-amber-900/20"
-											: p.isAlive
-											? "bg-slate-50 dark:bg-slate-700/50"
-											: "bg-slate-100 dark:bg-slate-800 opacity-60"
-									}`}
-								>
-									{/* Rank */}
-									<div className="w-8 h-8 flex items-center justify-center">
-										{rank === 1 ? (
-											<Trophy className="h-6 w-6 text-amber-500" />
-										) : rank === 2 ? (
-											<Medal className="h-5 w-5 text-slate-400" />
-										) : rank === 3 ? (
-											<Medal className="h-5 w-5 text-amber-700" />
-										) : (
-											<span className="text-slate-400 font-bold">
-												{rank}
-											</span>
-										)}
-									</div>
-
-									{/* Player info */}
+								return (
 									<div
-										className={`w-10 h-10 ${p.color} rounded-full flex items-center justify-center text-xl`}
+										key={p.playerId}
+										className={`flex items-center gap-4 p-4 border-4 ${
+											isPlayerWinner
+												? "bg-yellow-900 border-yellow-500"
+												: p.isAlive
+												? "bg-gray-800 border-gray-600"
+												: "bg-gray-900 border-gray-700 opacity-50"
+										}`}
 									>
-										{p.icon}
-									</div>
-									<div className="flex-1">
-										<div className="font-medium">
-											{p.name}
-											{p.playerId ===
-												player?.playerId && (
-												<span className="text-xs text-slate-500 ml-2">
-													(you)
+										{/* Rank */}
+										<div className="w-12 h-12 flex items-center justify-center">
+											{rank === 1 ? (
+												<Trophy className="h-10 w-10 text-yellow-400" />
+											) : rank === 2 ? (
+												<Medal className="h-8 w-8 text-gray-400" />
+											) : rank === 3 ? (
+												<Medal className="h-8 w-8 text-amber-700" />
+											) : (
+												<span className="text-gray-400 font-bold text-2xl">
+													{rank}
 												</span>
 											)}
 										</div>
-										<div className="text-xs text-slate-500">
-											{p.cardCount} cards remaining
-										</div>
-									</div>
 
-									{/* Status */}
-									{!p.isAlive && (
-										<Skull className="h-5 w-5 text-red-400" />
-									)}
-								</div>
-							);
-						})}
+										{/* Player info */}
+										<div
+											className={`w-14 h-14 ${p.color} border-4 border-black flex items-center justify-center text-3xl`}
+										>
+											{p.icon}
+										</div>
+										<div className="flex-1">
+											<div className="font-bold text-xl text-cyan-300 tracking-wide">
+												{p.name.toUpperCase()}
+												{p.playerId ===
+													player?.playerId && (
+													<span className="text-sm text-yellow-400 ml-3">
+														(YOU)
+													</span>
+												)}
+											</div>
+											<div className="text-base text-green-300 font-bold tracking-wide">
+												{p.cardCount} CARDS REMAINING
+											</div>
+										</div>
+
+										{/* Status */}
+										{!p.isAlive && (
+											<Skull className="h-8 w-8 text-red-400" />
+										)}
+									</div>
+								);
+							})}
+						</div>
 					</div>
 				</div>
 
-				{/* Theme song link (from plan) */}
-				<div className="text-center mb-8">
+				{/* Theme song link */}
+				<div className="text-center mb-12">
 					<a
 						href="https://suno.com/s/QFee4suGpweV5GXn"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-indigo-600 dark:text-indigo-400 hover:underline text-sm"
+						className="text-cyan-300 text-xl font-bold tracking-wide hover:text-cyan-400"
 					>
-						🎵 Listen to the victory theme
+						🎵 LISTEN TO THE VICTORY THEME
 					</a>
 				</div>
 
 				{/* Actions */}
-				<div className="flex gap-4">
-					<Link
-						to="/"
-						className="flex-1 flex items-center justify-center gap-2 py-4 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 rounded-xl font-semibold transition-colors"
-					>
-						<Home className="h-5 w-5" />
-						Home
+				<div className="flex gap-6 justify-center">
+					<Link to="/" className="n64-button">
+						<div className="n64-button-shadow bg-gradient-to-b from-gray-600 to-gray-800" />
+						<div className="n64-button-face bg-gradient-to-b from-gray-500 to-gray-700 border-gray-900 px-8 py-4 text-yellow-300 flex items-center gap-3">
+							<Home className="h-6 w-6" />
+							<span className="text-xl">HOME</span>
+						</div>
 					</Link>
-					<Link
-						to="/create"
-						className="flex-1 flex items-center justify-center gap-2 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-colors"
-					>
-						<RotateCcw className="h-5 w-5" />
-						New Game
+					<Link to="/create" className="n64-button">
+						<div className="n64-button-shadow bg-gradient-to-b from-purple-600 to-purple-800" />
+						<div className="n64-button-face bg-gradient-to-b from-purple-500 to-purple-700 border-purple-900 px-8 py-4 text-cyan-300 flex items-center gap-3">
+							<RotateCcw className="h-6 w-6" />
+							<span className="text-xl">NEW GAME</span>
+						</div>
 					</Link>
 				</div>
 			</main>

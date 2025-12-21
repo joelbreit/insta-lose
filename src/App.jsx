@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import N64Layout from "./components/N64Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import CreateGame from "./pages/CreateGame";
@@ -10,15 +11,17 @@ import GameRecap from "./pages/GameRecap";
 function App() {
 	return (
 		<Router>
-			<Routes>
-				<Route path="/" element={<Home />} />
-				<Route path="/about" element={<About />} />
-				<Route path="/create" element={<CreateGame />} />
-				<Route path="/join" element={<JoinGame />} />
-				<Route path="/waiting/:gameId" element={<WaitingRoom />} />
-				<Route path="/game/:gameId" element={<Game />} />
-				<Route path="/recap/:gameId" element={<GameRecap />} />
-			</Routes>
+			<N64Layout>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/about" element={<About />} />
+					<Route path="/create" element={<CreateGame />} />
+					<Route path="/join" element={<JoinGame />} />
+					<Route path="/waiting/:gameId" element={<WaitingRoom />} />
+					<Route path="/game/:gameId" element={<Game />} />
+					<Route path="/recap/:gameId" element={<GameRecap />} />
+				</Routes>
+			</N64Layout>
 		</Router>
 	);
 }
