@@ -46,7 +46,7 @@ function buildDeck(numPlayers) {
 	// Calculate deck size:
 	// - Initial hands: numPlayers * CARDS_FOR_INITIAL_HANDS
 	// - Plus buffer for gameplay: numPlayers * CARDS_PER_PLAYER
-	// - Plus insta-lose cards: numPlayers - 1
+	// NOTE: Insta-Lose cards are NOT added here - they're added AFTER dealing initial hands
 	const minCardsNeeded = numPlayers * CARDS_FOR_INITIAL_HANDS;
 	const bufferCards = numPlayers * CARDS_PER_PLAYER;
 	const totalRandomCards = minCardsNeeded + bufferCards;
@@ -77,15 +77,20 @@ function buildDeck(numPlayers) {
 		});
 	}
 
-	// Add insta-lose cards (numPlayers - 1)
+	// DO NOT add insta-lose cards here - they go in the deck AFTER initial hands are dealt
+	return shuffleArray(cards);
+}
+
+function addInstaLoseCardsToDeck(deck, numPlayers) {
+	// Add insta-lose cards (numPlayers - 1) to the remaining deck
 	for (let i = 0; i < numPlayers - 1; i++) {
-		cards.push({
+		deck.push({
 			id: generateCardId(),
 			type: CARD_TYPES.INSTA_LOSE,
 		});
 	}
-
-	return shuffleArray(cards);
+	// Shuffle again to mix in the insta-lose cards
+	return shuffleArray(deck);
 }
 
 function dealInitialHands(players, deck) {
@@ -181,7 +186,7 @@ exports.handler = async (event) => {
 
 		const numPlayers = game.players.length;
 
-		// Build and shuffle deck
+		// Build and shuffle deck (WITHOUT insta-lose cards)
 		let deck = buildDeck(numPlayers);
 
 		// Deal initial hands
@@ -189,6 +194,10 @@ exports.handler = async (event) => {
 			game.players,
 			deck
 		);
+
+		// NOW add insta-lose cards to the remaining deck
+		// This ensures insta-lose cards are NEVER in initial hands
+		const finalDeck = addInstaLoseCardsToDeck(remainingDeck, numPlayers);
 
 		// Randomize turn order
 		const turnOrder = shuffleArray(
@@ -227,7 +236,7 @@ exports.handler = async (event) => {
 			...game,
 			status: "in-progress",
 			players: updatedPlayers,
-			deck: remainingDeck,
+			deck: finalDeck, // Use the deck with insta-lose cards added
 			discardPile: game.discardPile || [],
 			turnOrder,
 			currentTurnPlayerId: firstPlayerId,
