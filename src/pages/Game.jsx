@@ -4,8 +4,9 @@ import PlayerList from "../components/PlayerList";
 import CardHand from "../components/CardHand";
 import { getGameState, takeAction } from "../services/api";
 import { CARD_TYPES } from "../utils/cardTypes";
-import { Users, Layers } from "lucide-react";
-
+import { Users, Layers, Music } from "lucide-react";
+// import { useGameMusic } from "../hooks/useMusic";
+import Header from "../components/Header";
 const POLL_INTERVAL = 2000; // 2 seconds
 
 function Game() {
@@ -19,6 +20,8 @@ function Game() {
 	const [showGameState, setShowGameState] = useState(false);
 	const [peekedCards, setPeekedCards] = useState(null);
 	const [actionResult, setActionResult] = useState(null);
+
+	// const { isPlaying, playGameMusic, stop } = useGameMusic();
 
 	// Game state from server
 	const [gameState, setGameState] = useState({
@@ -256,6 +259,7 @@ function Game() {
 					: "bg-slate-200 dark:bg-slate-950"
 			}`}
 		>
+			<Header />
 			{/* Top bar */}
 			<div className="bg-white dark:bg-slate-800 shadow-sm px-4 py-3">
 				<div className="flex justify-between items-center max-w-7xl mx-auto">
@@ -289,9 +293,22 @@ function Game() {
 			<div className="flex-1 flex flex-col p-4">
 				{/* Host spectator indicator */}
 				{isHost && (
-					<div className="mb-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-center text-sm font-medium">
-						👁️ Spectator Mode - You're watching the game
-					</div>
+					<>
+						<div className="mb-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-xl text-center text-sm font-medium">
+							👁️ Spectator Mode - You're watching the game
+						</div>
+						{/* TODO: Add mute/unmute, next/previous track buttons */}
+						{/* <button
+							type="button"
+							className={`inline-block mx-auto mb-4 px-6 py-2 bg-slate-400 text-white rounded-full`}
+							onClick={() => {
+								isPlaying ? stop() : playGameMusic();
+							}}
+						>
+							<Music className="h-4 w-4" />
+							{isPlaying ? "Mute" : "Unmute"}
+						</button> */}
+					</>
 				)}
 
 				{/* Error display */}

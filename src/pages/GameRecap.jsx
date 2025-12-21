@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import { getGameState } from "../services/api";
 import { Trophy, Medal, Skull, Home, RotateCcw } from "lucide-react";
+// import { useGameEndMusic } from "../hooks/useMusic";
 
 function GameRecap() {
 	const { gameId } = useParams();
@@ -11,6 +12,8 @@ function GameRecap() {
 	const [isHost, setIsHost] = useState(false);
 	const [gameState, setGameState] = useState(null);
 	const [error, setError] = useState(null);
+
+	// useGameEndMusic();
 
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
