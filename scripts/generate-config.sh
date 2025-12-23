@@ -5,6 +5,7 @@
 set -e
 
 API_ENDPOINT=$(cat scripts/output/api-endpoint.txt 2>/dev/null)
+WS_ENDPOINT=$(cat scripts/output/websocket-endpoint.txt 2>/dev/null)
 
 if [ -z "$API_ENDPOINT" ]; then
     echo "Error: API endpoint not found. Run setup-aws.sh first."
@@ -17,6 +18,7 @@ cat > src/config.js << EOF
 // Generated on: $(date)
 
 export const API_BASE_URL = "$API_ENDPOINT";
+export const WS_URL = "$WS_ENDPOINT";
 
 export const API_ENDPOINTS = {
     createGame: \`\${API_BASE_URL}/games\`,
@@ -29,3 +31,9 @@ EOF
 
 echo "Config generated at src/config.js"
 echo "API_BASE_URL: $API_ENDPOINT"
+
+if [ -n "$WS_ENDPOINT" ]; then
+    echo "WS_URL: $WS_ENDPOINT"
+else
+    echo "WS_URL: (not configured - run setup-websocket.sh first)"
+fi

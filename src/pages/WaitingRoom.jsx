@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import PlayerList from "../components/PlayerList";
@@ -7,15 +7,17 @@ import {
 	Copy,
 	Check,
 	RefreshCw,
-	Music,
 	Volume2,
 	VolumeX,
 	SkipForward,
+	Wifi,
+	WifiOff,
 } from "lucide-react";
 import { getGameState, startGame } from "../services/api";
+import { gameWebSocket } from "../services/websocket";
 import { useMusic } from "../hooks/useMusic";
 
-const POLL_INTERVAL = 2000; // 2 seconds
+const POLL_INTERVAL = 3000; // Fallback polling interval (3 seconds)
 
 function WaitingRoom() {
 	const { gameId } = useParams();
@@ -27,7 +29,11 @@ function WaitingRoom() {
 	const [players, setPlayers] = useState([]);
 	const [isStarting, setIsStarting] = useState(false);
 	const [error, setError] = useState(null);
-	const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+	const [wsConnected, setWsConnected] = useState(false);
+
+	// Refs for polling fallback
+	const pollIntervalRef = useRef(null);
+	const lastUpdatedAtRef = useRef(null);
 
 	const {
 		isPlaying,
@@ -50,7 +56,7 @@ function WaitingRoom() {
 		return () => {
 			stop();
 		};
-	}, [isHost]);
+	}, [isHost]); // can't add playGameMusic to dependencies because it will cause a loop
 
 	// Load player or host from localStorage
 	useEffect(() => {
@@ -76,50 +82,153 @@ function WaitingRoom() {
 		}
 	}, [gameId, navigate]);
 
-	// Poll for game state
-	const fetchGameState = useCallback(async () => {
-		if (!player && !host) return;
+	// Fetch game state (for initial load and fallback polling)
+	const fetchGameState = useCallback(
+		async (forceRefresh = false) => {
+			if (!player && !host) return;
 
-		try {
-			// For host mode, don't send playerId (spectator mode)
-			const playerId = isHost ? null : player?.playerId;
-			const state = await getGameState(gameId, playerId, lastUpdatedAt);
+			try {
+				// For host mode, don't send playerId (spectator mode)
+				const playerId = isHost ? null : player?.playerId;
+				const lastUpdatedAt = forceRefresh
+					? null
+					: lastUpdatedAtRef.current;
+				const state = await getGameState(
+					gameId,
+					playerId,
+					lastUpdatedAt
+				);
 
-			if (state === null) {
-				// Not modified (304)
-				return;
+				if (state === null) {
+					// Not modified (304)
+					return;
+				}
+
+				// Check if game has started
+				if (state.status === "in-progress") {
+					navigate(`/game/${gameId}`);
+					return;
+				}
+
+				setPlayers(state.players);
+				lastUpdatedAtRef.current = state.updatedAt;
+				setError(null);
+			} catch (err) {
+				console.error("Failed to fetch game state:", err);
+				// Only show error if it's not a network issue during polling
+				if (!lastUpdatedAtRef.current) {
+					setError(err.message || "Failed to load game");
+				}
 			}
+		},
+		[gameId, player, host, isHost, navigate]
+	);
 
-			// Check if game has started
-			if (state.status === "in-progress") {
-				navigate(`/game/${gameId}`);
-				return;
-			}
+	// Handle WebSocket messages
+	const handleWebSocketMessage = useCallback(
+		(message) => {
+			if (message.type === "gameStateUpdate" && message.data) {
+				const state = message.data;
 
-			setPlayers(state.players);
-			setLastUpdatedAt(state.updatedAt);
-			setError(null);
-		} catch (err) {
-			console.error("Failed to fetch game state:", err);
-			// Only show error if it's not a network issue during polling
-			if (!lastUpdatedAt) {
-				setError(err.message || "Failed to load game");
+				// Check if game has started
+				if (state.status === "in-progress") {
+					navigate(`/game/${gameId}`);
+					return;
+				}
+
+				setPlayers(state.players);
+				lastUpdatedAtRef.current = state.updatedAt;
+				setError(null);
 			}
+		},
+		[gameId, navigate]
+	);
+
+	// Start fallback polling
+	const startPolling = useCallback(() => {
+		if (pollIntervalRef.current) return; // Already polling
+		console.log("Starting fallback polling");
+		pollIntervalRef.current = setInterval(
+			() => fetchGameState(false),
+			POLL_INTERVAL
+		);
+	}, [fetchGameState]);
+
+	// Stop fallback polling
+	const stopPolling = useCallback(() => {
+		if (pollIntervalRef.current) {
+			console.log("Stopping fallback polling");
+			clearInterval(pollIntervalRef.current);
+			pollIntervalRef.current = null;
 		}
-	}, [gameId, player, host, isHost, lastUpdatedAt, navigate]);
+	}, []);
 
-	// Initial load and polling
+	// WebSocket connection and fallback polling
 	useEffect(() => {
 		if (!player && !host) return;
 
-		// Initial fetch
-		fetchGameState();
+		const playerId = isHost ? null : player?.playerId;
 
-		// Set up polling
-		const interval = setInterval(fetchGameState, POLL_INTERVAL);
+		// Initial fetch (always do this)
+		fetchGameState(true);
 
-		return () => clearInterval(interval);
-	}, [player, host, fetchGameState]);
+		// Try WebSocket connection
+		if (gameWebSocket.isAvailable()) {
+			gameWebSocket
+				.connect(gameId, playerId, isHost)
+				.then(() => {
+					setWsConnected(true);
+					stopPolling(); // Stop polling if WebSocket connected
+				})
+				.catch((err) => {
+					console.warn(
+						"WebSocket connection failed, using polling:",
+						err
+					);
+					setWsConnected(false);
+					startPolling();
+				});
+
+			// Register message handler
+			const removeMessageHandler = gameWebSocket.onMessage(
+				handleWebSocketMessage
+			);
+
+			// Handle WebSocket close - fall back to polling
+			const removeCloseHandler = gameWebSocket.onClose(() => {
+				setWsConnected(false);
+				startPolling();
+			});
+
+			// Handle WebSocket reconnect
+			const removeOpenHandler = gameWebSocket.onOpen(() => {
+				setWsConnected(true);
+				stopPolling();
+				fetchGameState(true); // Refresh state on reconnect
+			});
+
+			return () => {
+				removeMessageHandler();
+				removeCloseHandler();
+				removeOpenHandler();
+				gameWebSocket.disconnect();
+				stopPolling();
+			};
+		} else {
+			// WebSocket not available, use polling
+			startPolling();
+			return () => stopPolling();
+		}
+	}, [
+		player,
+		host,
+		isHost,
+		gameId,
+		fetchGameState,
+		handleWebSocketMessage,
+		startPolling,
+		stopPolling,
+	]);
 
 	const copyGameCode = () => {
 		navigator.clipboard.writeText(gameId);
@@ -135,6 +244,7 @@ function WaitingRoom() {
 
 		try {
 			await startGame(gameId, player.playerId);
+			// WebSocket will notify us when game starts, but navigate anyway
 			navigate(`/game/${gameId}`);
 		} catch (err) {
 			console.error("Failed to start game:", err);
@@ -145,8 +255,7 @@ function WaitingRoom() {
 	};
 
 	const handleRefresh = () => {
-		setLastUpdatedAt(null);
-		fetchGameState();
+		fetchGameState(true);
 	};
 
 	// First player is the MVP (can start the game)
@@ -164,8 +273,24 @@ function WaitingRoom() {
 				// Top bar
 				<div className="bg-gradient-to-b from-gray-800 to-black border-b-4 border-cyan-500 px-4 py-4">
 					<div className="flex justify-between items-center max-w-7xl mx-auto">
-						<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
-							{gameId}
+						<div className="flex items-center gap-3">
+							<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
+								{gameId}
+							</div>
+							{/* Connection status indicator */}
+							<div
+								title={
+									wsConnected
+										? "Real-time connected"
+										: "Using polling"
+								}
+							>
+								{wsConnected ? (
+									<Wifi className="h-5 w-5 text-green-400" />
+								) : (
+									<WifiOff className="h-5 w-5 text-yellow-500" />
+								)}
+							</div>
 						</div>
 						<div className="flex items-center gap-6 text-lg">
 							{/* Unmute/Mute Music */}
@@ -222,6 +347,26 @@ function WaitingRoom() {
 							</button>
 						</div>
 					</div>
+					{/* Connection status for non-hosts */}
+					{!isHost && (
+						<div className="mt-4 flex items-center justify-center gap-2 text-sm">
+							{wsConnected ? (
+								<>
+									<Wifi className="h-4 w-4 text-green-400" />
+									<span className="text-green-400">
+										Real-time connected
+									</span>
+								</>
+							) : (
+								<>
+									<WifiOff className="h-4 w-4 text-yellow-500" />
+									<span className="text-yellow-500">
+										Using polling
+									</span>
+								</>
+							)}
+						</div>
+					)}
 				</div>
 
 				{error && (

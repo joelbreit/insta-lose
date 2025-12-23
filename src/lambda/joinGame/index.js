@@ -4,7 +4,7 @@ const {
 	GetCommand,
 	UpdateCommand,
 } = require("@aws-sdk/lib-dynamodb");
-const { broadcastToGame } = require("../shared/broadcast");
+const { broadcastToGame } = require("./shared/broadcast");
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);

@@ -4,6 +4,9 @@
 // Fallback for local development - will be overwritten by generate-config.sh
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// WebSocket URL - empty string means not configured (will fall back to polling)
+export const WS_URL = import.meta.env.VITE_WS_URL || "";
+
 export const API_ENDPOINTS = {
 	createGame: `${API_BASE_URL}/games`,
 	joinGame: (gameId) => `${API_BASE_URL}/games/${gameId}/join`,

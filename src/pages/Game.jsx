@@ -1,20 +1,23 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PlayerList from "../components/PlayerList";
 import CardHand from "../components/CardHand";
 import { getGameState, takeAction } from "../services/api";
+import { gameWebSocket } from "../services/websocket";
 import { CARD_TYPES } from "../utils/cardTypes";
 import {
 	Users,
 	Layers,
-	Music,
 	Volume2,
 	VolumeX,
 	SkipForward,
+	Wifi,
+	WifiOff,
 } from "lucide-react";
 import { useMusic } from "../hooks/useMusic";
 import Header from "../components/Header";
-const POLL_INTERVAL = 2000; // 2 seconds
+
+const POLL_INTERVAL = 3000; // Fallback polling interval (3 seconds)
 
 function Game() {
 	const { gameId } = useParams();
@@ -23,10 +26,14 @@ function Game() {
 	const [selectedCard, setSelectedCard] = useState(null);
 	const [isActing, setIsActing] = useState(false);
 	const [error, setError] = useState(null);
-	const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
 	const [showGameState, setShowGameState] = useState(false);
 	const [peekedCards, setPeekedCards] = useState(null);
 	const [actionResult, setActionResult] = useState(null);
+	const [wsConnected, setWsConnected] = useState(false);
+
+	// Refs for polling fallback
+	const pollIntervalRef = useRef(null);
+	const lastUpdatedAtRef = useRef(null);
 
 	const {
 		isPlaying,
@@ -61,7 +68,6 @@ function Game() {
 			// Verify this host belongs to this game
 			if (hostData.gameId === gameId) {
 				setIsHost(true);
-				// Host doesn't need player data, but we set a flag
 			} else {
 				// Wrong game, redirect
 				navigate("/");
@@ -74,47 +80,150 @@ function Game() {
 		}
 	}, [gameId, navigate]);
 
-	// Poll for game state
-	const fetchGameState = useCallback(async () => {
-		// Allow polling even if no player (host mode)
-		try {
-			// For host mode, don't send playerId (spectator mode)
-			const playerId = isHost ? null : player?.playerId;
-			const state = await getGameState(gameId, playerId, lastUpdatedAt);
+	// Fetch game state (for initial load and fallback polling)
+	const fetchGameState = useCallback(
+		async (forceRefresh = false) => {
+			try {
+				const playerId = isHost ? null : player?.playerId;
+				const lastUpdatedAt = forceRefresh
+					? null
+					: lastUpdatedAtRef.current;
+				const state = await getGameState(
+					gameId,
+					playerId,
+					lastUpdatedAt
+				);
 
-			if (state === null) {
-				// Not modified (304)
-				return;
+				if (state === null) {
+					// Not modified (304)
+					return;
+				}
+
+				// Check if game has finished
+				if (state.status === "finished") {
+					navigate(`/recap/${gameId}`);
+					return;
+				}
+
+				setGameState(state);
+				lastUpdatedAtRef.current = state.updatedAt;
+				setError(null);
+			} catch (err) {
+				console.error("Failed to fetch game state:", err);
 			}
+		},
+		[gameId, player, isHost, navigate]
+	);
 
-			// Check if game has finished
-			if (state.status === "finished") {
-				navigate(`/recap/${gameId}`);
-				return;
+	// Handle WebSocket messages
+	const handleWebSocketMessage = useCallback(
+		(message) => {
+			if (message.type === "gameStateUpdate" && message.data) {
+				const state = message.data;
+
+				// Check if game has finished
+				if (state.status === "finished") {
+					navigate(`/recap/${gameId}`);
+					return;
+				}
+
+				setGameState(state);
+				lastUpdatedAtRef.current = state.updatedAt;
+				setError(null);
+
+				// Handle peeked cards from action result
+				if (message.actionResult?.peekedCards) {
+					setPeekedCards(message.actionResult.peekedCards);
+				}
 			}
+		},
+		[gameId, navigate]
+	);
 
-			setGameState(state);
-			setLastUpdatedAt(state.updatedAt);
-			setError(null);
-		} catch (err) {
-			console.error("Failed to fetch game state:", err);
+	// Start fallback polling
+	const startPolling = useCallback(() => {
+		if (pollIntervalRef.current) return; // Already polling
+		console.log("Starting fallback polling");
+		pollIntervalRef.current = setInterval(
+			() => fetchGameState(false),
+			POLL_INTERVAL
+		);
+	}, [fetchGameState]);
+
+	// Stop fallback polling
+	const stopPolling = useCallback(() => {
+		if (pollIntervalRef.current) {
+			console.log("Stopping fallback polling");
+			clearInterval(pollIntervalRef.current);
+			pollIntervalRef.current = null;
 		}
-	}, [gameId, player, isHost, lastUpdatedAt, navigate]);
+	}, []);
 
-	// Initial load and polling
+	// WebSocket connection and fallback polling
 	useEffect(() => {
-		// Allow polling for both players and hosts
 		if (!player && !isHost) return;
 
-		// Initial fetch (force refresh)
-		setLastUpdatedAt(null);
-		fetchGameState();
+		const playerId = isHost ? null : player?.playerId;
 
-		// Set up polling
-		const interval = setInterval(fetchGameState, POLL_INTERVAL);
+		// Initial fetch (always do this)
+		fetchGameState(true);
 
-		return () => clearInterval(interval);
-	}, [player, isHost, fetchGameState]);
+		// Try WebSocket connection
+		if (gameWebSocket.isAvailable()) {
+			gameWebSocket
+				.connect(gameId, playerId, isHost)
+				.then(() => {
+					setWsConnected(true);
+					stopPolling(); // Stop polling if WebSocket connected
+				})
+				.catch((err) => {
+					console.warn(
+						"WebSocket connection failed, using polling:",
+						err
+					);
+					setWsConnected(false);
+					startPolling();
+				});
+
+			// Register message handler
+			const removeMessageHandler = gameWebSocket.onMessage(
+				handleWebSocketMessage
+			);
+
+			// Handle WebSocket close - fall back to polling
+			const removeCloseHandler = gameWebSocket.onClose(() => {
+				setWsConnected(false);
+				startPolling();
+			});
+
+			// Handle WebSocket reconnect
+			const removeOpenHandler = gameWebSocket.onOpen(() => {
+				setWsConnected(true);
+				stopPolling();
+				fetchGameState(true); // Refresh state on reconnect
+			});
+
+			return () => {
+				removeMessageHandler();
+				removeCloseHandler();
+				removeOpenHandler();
+				gameWebSocket.disconnect();
+				stopPolling();
+			};
+		} else {
+			// WebSocket not available, use polling
+			startPolling();
+			return () => stopPolling();
+		}
+	}, [
+		player,
+		isHost,
+		gameId,
+		fetchGameState,
+		handleWebSocketMessage,
+		startPolling,
+		stopPolling,
+	]);
 
 	// Auto-start music when game loads
 	useEffect(() => {
@@ -127,7 +236,7 @@ function Game() {
 		return () => {
 			stop();
 		};
-	}, [isHost]);
+	}, [isHost]); // can't add playGameMusic to dependencies because it will cause a loop
 
 	const isMyTurn =
 		!isHost && gameState.currentTurnPlayerId === player?.playerId;
@@ -160,9 +269,10 @@ function Game() {
 				});
 			}
 
-			// Force refresh game state
-			setLastUpdatedAt(null);
-			await fetchGameState();
+			// If not using WebSocket, fetch updated state
+			if (!wsConnected) {
+				await fetchGameState(true);
+			}
 		} catch (err) {
 			console.error("Failed to draw card:", err);
 			setError(err.message || "Failed to draw card");
@@ -215,7 +325,7 @@ function Game() {
 				targetPlayerId,
 			});
 
-			// Handle peek result
+			// Handle peek result (from REST response, WebSocket will also send this)
 			if (result.action?.peekedCards) {
 				setPeekedCards(result.action.peekedCards);
 			}
@@ -235,9 +345,10 @@ function Game() {
 
 			setSelectedCard(null);
 
-			// Force refresh game state
-			setLastUpdatedAt(null);
-			await fetchGameState();
+			// If not using WebSocket, fetch updated state
+			if (!wsConnected) {
+				await fetchGameState(true);
+			}
 		} catch (err) {
 			console.error("Failed to play card:", err);
 			setError(err.message || "Failed to play card");
@@ -285,8 +396,24 @@ function Game() {
 			{/* Top bar */}
 			<div className="bg-gradient-to-b from-gray-800 to-black border-b-4 border-cyan-500 px-4 py-4">
 				<div className="flex justify-between items-center max-w-7xl mx-auto">
-					<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
-						{gameId}
+					<div className="flex items-center gap-3">
+						<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
+							{gameId}
+						</div>
+						{/* Connection status indicator */}
+						<div
+							title={
+								wsConnected
+									? "Real-time connected"
+									: "Using polling"
+							}
+						>
+							{wsConnected ? (
+								<Wifi className="h-5 w-5 text-green-400" />
+							) : (
+								<WifiOff className="h-5 w-5 text-yellow-500" />
+							)}
+						</div>
 					</div>
 					<div className="flex items-center gap-6 text-lg">
 						{isHost && (
