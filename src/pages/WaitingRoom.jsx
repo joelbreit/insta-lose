@@ -3,8 +3,17 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import PlayerList from "../components/PlayerList";
 import N64Button from "../components/N64Button";
-import { Copy, Check, RefreshCw } from "lucide-react";
+import {
+	Copy,
+	Check,
+	RefreshCw,
+	Music,
+	Volume2,
+	VolumeX,
+	SkipForward,
+} from "lucide-react";
 import { getGameState, startGame } from "../services/api";
+import { useMusic } from "../hooks/useMusic";
 
 const POLL_INTERVAL = 2000; // 2 seconds
 
@@ -16,16 +25,38 @@ function WaitingRoom() {
 	const [host, setHost] = useState(null);
 	const [isHost, setIsHost] = useState(false);
 	const [players, setPlayers] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
 	const [isStarting, setIsStarting] = useState(false);
 	const [error, setError] = useState(null);
 	const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+
+	const {
+		isPlaying,
+		playGameMusic,
+		stop,
+		pause,
+		resume,
+		playNextTrack,
+		status,
+	} = useMusic();
+
+	// Auto-start music when game loads
+	useEffect(() => {
+		if (isHost) {
+			// Try to start music (may fail due to autoplay policy)
+			playGameMusic();
+		}
+
+		// Clean up music when leaving game
+		return () => {
+			stop();
+		};
+	}, [isHost]);
 
 	// Load player or host from localStorage
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
 		const storedHost = localStorage.getItem("host");
-		
+
 		if (storedHost) {
 			const hostData = JSON.parse(storedHost);
 			// Verify this host belongs to this game
@@ -52,11 +83,7 @@ function WaitingRoom() {
 		try {
 			// For host mode, don't send playerId (spectator mode)
 			const playerId = isHost ? null : player?.playerId;
-			const state = await getGameState(
-				gameId,
-				playerId,
-				lastUpdatedAt
-			);
+			const state = await getGameState(gameId, playerId, lastUpdatedAt);
 
 			if (state === null) {
 				// Not modified (304)
@@ -133,6 +160,42 @@ function WaitingRoom() {
 	return (
 		<div className="min-h-screen">
 			<Header />
+			{isHost && (
+				// Top bar
+				<div className="bg-gradient-to-b from-gray-800 to-black border-b-4 border-cyan-500 px-4 py-4">
+					<div className="flex justify-between items-center max-w-7xl mx-auto">
+						<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
+							{gameId}
+						</div>
+						<div className="flex items-center gap-6 text-lg">
+							{/* Unmute/Mute Music */}
+							<button
+								onClick={() => (isPlaying ? pause() : resume())}
+								className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
+							>
+								{isPlaying ? (
+									<Volume2 className="h-8 w-8 text-yellow-300" />
+								) : (
+									<VolumeX className="h-8 w-8 text-gray-400" />
+								)}
+							</button>
+							{/* Next Track */}
+							<button
+								onClick={playNextTrack}
+								className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
+							>
+								<SkipForward className="h-8 w-8 text-cyan-300" />
+							</button>
+							{/* Track Number */}
+							<div className="px-4 py-2 bg-gradient-to-b from-gray-700 to-gray-900 border-4 border-gray-600">
+								<span className="font-bold text-green-300 tracking-wide text-sm">
+									TRACK {status.currentTrackIndex + 1}/7
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
 
 			<main className="mx-auto max-w-2xl px-4 py-12">
 				<div className="text-center mb-12">
@@ -210,8 +273,8 @@ function WaitingRoom() {
 							</p>
 						) : (
 							<p>
-								WAITING FOR {players[0]?.name.toUpperCase()} TO START THE
-								GAME...
+								WAITING FOR {players[0]?.name.toUpperCase()} TO
+								START THE GAME...
 							</p>
 						)
 					) : players.length < 2 ? (
@@ -220,7 +283,8 @@ function WaitingRoom() {
 						<p>YOU'RE THE MVP! START WHEN EVERYONE'S READY.</p>
 					) : (
 						<p>
-							WAITING FOR {players[0]?.name.toUpperCase()} TO START THE GAME...
+							WAITING FOR {players[0]?.name.toUpperCase()} TO
+							START THE GAME...
 						</p>
 					)}
 				</div>

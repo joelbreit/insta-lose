@@ -4,8 +4,15 @@ import PlayerList from "../components/PlayerList";
 import CardHand from "../components/CardHand";
 import { getGameState, takeAction } from "../services/api";
 import { CARD_TYPES } from "../utils/cardTypes";
-import { Users, Layers, Music } from "lucide-react";
-// import { useGameMusic } from "../hooks/useMusic";
+import {
+	Users,
+	Layers,
+	Music,
+	Volume2,
+	VolumeX,
+	SkipForward,
+} from "lucide-react";
+import { useMusic } from "../hooks/useMusic";
 import Header from "../components/Header";
 const POLL_INTERVAL = 2000; // 2 seconds
 
@@ -21,7 +28,15 @@ function Game() {
 	const [peekedCards, setPeekedCards] = useState(null);
 	const [actionResult, setActionResult] = useState(null);
 
-	// const { isPlaying, playGameMusic, stop } = useGameMusic();
+	const {
+		isPlaying,
+		playGameMusic,
+		stop,
+		pause,
+		resume,
+		playNextTrack,
+		status,
+	} = useMusic();
 
 	// Game state from server
 	const [gameState, setGameState] = useState({
@@ -99,7 +114,20 @@ function Game() {
 		const interval = setInterval(fetchGameState, POLL_INTERVAL);
 
 		return () => clearInterval(interval);
-	}, [player, isHost, fetchGameState]); // Include fetchGameState to satisfy linter
+	}, [player, isHost, fetchGameState]);
+
+	// Auto-start music when game loads
+	useEffect(() => {
+		if (isHost) {
+			// Try to start music (may fail due to autoplay policy)
+			playGameMusic();
+		}
+
+		// Clean up music when leaving game
+		return () => {
+			stop();
+		};
+	}, [isHost]);
 
 	const isMyTurn =
 		!isHost && gameState.currentTurnPlayerId === player?.playerId;
@@ -261,6 +289,45 @@ function Game() {
 						{gameId}
 					</div>
 					<div className="flex items-center gap-6 text-lg">
+						{isHost && (
+							// Music Controls
+							<div className="flex items-center gap-2">
+								<button
+									onClick={() =>
+										isPlaying
+											? pause()
+											: status.hasAudio
+											? resume()
+											: playGameMusic()
+									}
+									className="flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
+									title={
+										isPlaying
+											? "Mute Music"
+											: "Unmute Music"
+									}
+								>
+									{isPlaying ? (
+										<Volume2 className="h-6 w-6 text-yellow-300" />
+									) : (
+										<VolumeX className="h-6 w-6 text-gray-400" />
+									)}
+								</button>
+								<button
+									onClick={playNextTrack}
+									className="flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
+									title="Next Track"
+								>
+									<SkipForward className="h-6 w-6 text-cyan-300" />
+								</button>
+								<div className="px-4 py-2 bg-gradient-to-b from-gray-700 to-gray-900 border-4 border-gray-600">
+									<span className="font-bold text-green-300 tracking-wide text-sm">
+										TRACK {status.currentTrackIndex + 1}/7
+									</span>
+								</div>
+							</div>
+						)}
+
 						<div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-b from-gray-700 to-gray-900 border-4 border-gray-600">
 							<Layers className="h-6 w-6 text-cyan-300" />
 							<span className="font-bold text-yellow-300 tracking-wide">
@@ -291,11 +358,17 @@ function Game() {
 						{/* Current Turn - HUGE */}
 						<div className="text-center mb-8">
 							<div className="inline-block px-16 py-8 bg-gradient-to-b from-yellow-600 to-yellow-800 border-8 border-yellow-900 animate-pulse">
-								<div className="text-5xl font-bold text-black tracking-wider mb-2">CURRENT TURN</div>
+								<div className="text-5xl font-bold text-black tracking-wider mb-2">
+									CURRENT TURN
+								</div>
 								<div className="text-7xl font-bold text-black tracking-widest">
-									{(gameState.players.find(
-										(p) => p.playerId === gameState.currentTurnPlayerId
-									)?.name || "...").toUpperCase()}
+									{(
+										gameState.players.find(
+											(p) =>
+												p.playerId ===
+												gameState.currentTurnPlayerId
+										)?.name || "..."
+									).toUpperCase()}
 								</div>
 							</div>
 						</div>
@@ -307,8 +380,12 @@ function Game() {
 								<div className="bevel-outer" />
 								<div className="bevel-inner" />
 								<div className="bevel-content p-8 text-center">
-									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">DRAW PILE</div>
-									<div className="text-8xl font-bold text-yellow-300 mb-4">{gameState.deckCount}</div>
+									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">
+										DRAW PILE
+									</div>
+									<div className="text-8xl font-bold text-yellow-300 mb-4">
+										{gameState.deckCount}
+									</div>
 									<div className="text-4xl">🎴</div>
 								</div>
 							</div>
@@ -318,8 +395,12 @@ function Game() {
 								<div className="bevel-outer" />
 								<div className="bevel-inner" />
 								<div className="bevel-content p-8 text-center">
-									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">DISCARD PILE</div>
-									<div className="text-8xl font-bold text-yellow-300 mb-4">{gameState.discardPileCount}</div>
+									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">
+										DISCARD PILE
+									</div>
+									<div className="text-8xl font-bold text-yellow-300 mb-4">
+										{gameState.discardPileCount}
+									</div>
 									<div className="text-4xl">🗑️</div>
 								</div>
 							</div>
@@ -330,10 +411,14 @@ function Game() {
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
 							<div className="bevel-content p-8">
-								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">PLAYERS</div>
+								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">
+									PLAYERS
+								</div>
 								<PlayerList
 									players={gameState.players}
-									currentTurnPlayerId={gameState.currentTurnPlayerId}
+									currentTurnPlayerId={
+										gameState.currentTurnPlayerId
+									}
 									showCardCount
 								/>
 							</div>
@@ -344,28 +429,40 @@ function Game() {
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
 							<div className="bevel-content p-8">
-								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">RECENT ACTIONS</div>
+								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">
+									RECENT ACTIONS
+								</div>
 								<div className="space-y-3">
 									{gameState.actions
 										.slice(-8)
 										.reverse()
 										.map((action, i) => {
-											const actionPlayer = gameState.players.find(
-												(p) => p.playerId === action.playerId
-											);
+											const actionPlayer =
+												gameState.players.find(
+													(p) =>
+														p.playerId ===
+														action.playerId
+												);
 											return (
 												<div
 													key={i}
 													className="flex items-center gap-4 p-4 bg-gray-900 border-4 border-gray-600"
 												>
 													{actionPlayer && (
-														<div className={`w-12 h-12 ${actionPlayer.color} border-4 border-black flex items-center justify-center text-2xl`}>
+														<div
+															className={`w-12 h-12 ${actionPlayer.color} border-4 border-black flex items-center justify-center text-2xl`}
+														>
 															{actionPlayer.icon}
 														</div>
 													)}
 													<div className="flex-1">
 														<div className="text-2xl font-bold text-green-300 tracking-wide">
-															{(actionPlayer?.name || "?").toUpperCase()}: {action.type.toUpperCase()}
+															{(
+																actionPlayer?.name ||
+																"?"
+															).toUpperCase()}
+															:{" "}
+															{action.type.toUpperCase()}
 														</div>
 														{action.cardType && (
 															<div className="text-xl text-yellow-300 font-bold tracking-wide">
@@ -386,7 +483,9 @@ function Game() {
 						{/* Error display */}
 						{error && (
 							<div className="mb-6 p-6 bg-red-900 border-4 border-red-500 text-center">
-								<p className="text-xl font-bold text-yellow-300 tracking-wide">{error.toUpperCase()}</p>
+								<p className="text-xl font-bold text-yellow-300 tracking-wide">
+									{error.toUpperCase()}
+								</p>
 							</div>
 						)}
 
@@ -401,7 +500,9 @@ function Game() {
 										: "bg-purple-900 border-purple-500"
 								}`}
 							>
-								<p className="text-xl font-bold text-yellow-300 tracking-wide mb-3">{actionResult.message.toUpperCase()}</p>
+								<p className="text-xl font-bold text-yellow-300 tracking-wide mb-3">
+									{actionResult.message.toUpperCase()}
+								</p>
 								<button
 									onClick={() => setActionResult(null)}
 									className="px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold tracking-wide"
@@ -422,28 +523,39 @@ function Game() {
 									</div>
 									<div className="flex justify-center gap-4">
 										{peekedCards.map((card) => {
-											const normalizedType = card.type?.startsWith(
-												"pairs-"
-											)
-												? "pairs"
-												: card.type;
-											const cardType = CARD_TYPES[normalizedType];
+											const normalizedType =
+												card.type?.startsWith("pairs-")
+													? "pairs"
+													: card.type;
+											const cardType =
+												CARD_TYPES[normalizedType];
 											return (
 												<div
 													key={card.id}
 													className={`w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
-														cardType?.bgColor || "bg-slate-500"
+														cardType?.bgColor ||
+														"bg-slate-500"
 													} ${
-														cardType?.textColor || "text-white"
+														cardType?.textColor ||
+														"text-white"
 													}`}
-													style={{ boxShadow: '0 4px 0 #000' }}
+													style={{
+														boxShadow:
+															"0 4px 0 #000",
+													}}
 												>
 													<span className="text-3xl">
 														{cardType?.icon || "?"}
 													</span>
-													{card.type.startsWith("pairs-") ? (
+													{card.type.startsWith(
+														"pairs-"
+													) ? (
 														<span className="text-sm font-bold text-center px-1 tracking-wide">
-															{card.type.split("-")[1]}
+															{
+																card.type.split(
+																	"-"
+																)[1]
+															}
 														</span>
 													) : (
 														<span className="text-xs font-bold text-center px-1 tracking-wide">
@@ -468,19 +580,27 @@ function Game() {
 						<div className="text-center mb-8">
 							{!isAlive ? (
 								<div className="inline-block px-10 py-4 bg-gradient-to-b from-red-600 to-red-800 border-4 border-red-900">
-									<span className="text-2xl font-bold text-yellow-300 tracking-wider">💀 ELIMINATED</span>
+									<span className="text-2xl font-bold text-yellow-300 tracking-wider">
+										💀 ELIMINATED
+									</span>
 								</div>
 							) : isMyTurn ? (
 								<div className="inline-block px-10 py-4 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 animate-pulse">
-									<span className="text-2xl font-bold text-black tracking-wider">YOUR TURN!</span>
+									<span className="text-2xl font-bold text-black tracking-wider">
+										YOUR TURN!
+									</span>
 								</div>
 							) : (
 								<div className="inline-block px-10 py-4 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900">
 									<span className="text-2xl font-bold text-cyan-300 tracking-wider">
-										{(gameState.players.find(
-											(p) =>
-												p.playerId === gameState.currentTurnPlayerId
-										)?.name || "...").toUpperCase()}'S TURN
+										{(
+											gameState.players.find(
+												(p) =>
+													p.playerId ===
+													gameState.currentTurnPlayerId
+											)?.name || "..."
+										).toUpperCase()}
+										'S TURN
 									</span>
 								</div>
 							)}
@@ -493,7 +613,9 @@ function Game() {
 							<div className="bevel-content p-6">
 								<PlayerList
 									players={gameState.players}
-									currentTurnPlayerId={gameState.currentTurnPlayerId}
+									currentTurnPlayerId={
+										gameState.currentTurnPlayerId
+									}
 									showCardCount
 								/>
 							</div>
@@ -525,8 +647,12 @@ function Game() {
 										}
 										className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
 									>
-										<span className="text-2xl">{p.icon}</span>
-										<span className="font-bold text-xl text-cyan-300 tracking-wide">{p.name.toUpperCase()}</span>
+										<span className="text-2xl">
+											{p.icon}
+										</span>
+										<span className="font-bold text-xl text-cyan-300 tracking-wide">
+											{p.name.toUpperCase()}
+										</span>
 										<span className="text-lg text-yellow-300 font-bold">
 											({p.cardCount})
 										</span>
@@ -581,7 +707,9 @@ function Game() {
 						<div className="bevel-outer" />
 						<div className="bevel-inner" />
 						<div className="bevel-content p-8">
-							<h3 className="text-3xl font-bold mb-8 text-yellow-300 tracking-wider">GAME STATE</h3>
+							<h3 className="text-3xl font-bold mb-8 text-yellow-300 tracking-wider">
+								GAME STATE
+							</h3>
 
 							<div className="space-y-6">
 								<div className="p-4 bg-gray-900 border-4 border-gray-600">
@@ -635,7 +763,11 @@ function Game() {
 														key={i}
 														className="text-green-300 font-bold tracking-wide p-2 bg-gray-900 border-2 border-gray-700"
 													>
-														{(actionPlayer?.name || "?").toUpperCase()}:{" "}
+														{(
+															actionPlayer?.name ||
+															"?"
+														).toUpperCase()}
+														:{" "}
 														{action.type.toUpperCase()}
 														{action.cardType &&
 															` (${action.cardType.toUpperCase()})`}

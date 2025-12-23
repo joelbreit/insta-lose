@@ -2,8 +2,18 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import { getGameState } from "../services/api";
-import { Trophy, Medal, Skull, Home, RotateCcw } from "lucide-react";
-// import { useGameEndMusic } from "../hooks/useMusic";
+import {
+	Trophy,
+	Medal,
+	Skull,
+	Home,
+	RotateCcw,
+	Users,
+	Volume2,
+	VolumeX,
+} from "lucide-react";
+import { useGameEndMusic } from "../hooks/useMusic";
+import { useMusic } from "../hooks/useMusic";
 
 function GameRecap() {
 	const { gameId } = useParams();
@@ -13,7 +23,8 @@ function GameRecap() {
 	const [gameState, setGameState] = useState(null);
 	const [error, setError] = useState(null);
 
-	// useGameEndMusic();
+	useGameEndMusic();
+	const { isPlaying, pause, playTheme } = useMusic();
 
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
@@ -54,8 +65,13 @@ function GameRecap() {
 			<div className="min-h-screen">
 				<Header />
 				<main className="mx-auto max-w-2xl px-4 py-16 text-center">
-					<p className="text-red-400 text-2xl font-bold tracking-wide mb-8">{error.toUpperCase()}</p>
-					<Link to="/" className="text-cyan-300 text-xl font-bold tracking-wide hover:text-cyan-400">
+					<p className="text-red-400 text-2xl font-bold tracking-wide mb-8">
+						{error.toUpperCase()}
+					</p>
+					<Link
+						to="/"
+						className="text-cyan-300 text-xl font-bold tracking-wide hover:text-cyan-400"
+					>
 						RETURN HOME
 					</Link>
 				</main>
@@ -68,7 +84,9 @@ function GameRecap() {
 			<div className="min-h-screen">
 				<Header />
 				<main className="mx-auto max-w-2xl px-4 py-16 text-center">
-					<p className="text-yellow-300 text-2xl font-bold tracking-wide">LOADING RESULTS...</p>
+					<p className="text-yellow-300 text-2xl font-bold tracking-wide">
+						LOADING RESULTS...
+					</p>
 				</main>
 			</div>
 		);
@@ -97,10 +115,43 @@ function GameRecap() {
 			<Header />
 
 			<main className="mx-auto max-w-3xl px-4 py-12">
+				{isHost && (
+					// Music Control - Top Right
+					<div className="fixed top-24 right-8 z-40">
+						<button
+							onClick={() => (isPlaying ? pause() : playTheme())}
+							className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
+							title={
+								isPlaying
+									? "Mute Victory Theme"
+									: "Unmute Victory Theme"
+							}
+						>
+							{isPlaying ? (
+								<>
+									<Volume2 className="h-8 w-8 text-yellow-300" />
+									<span className="font-bold text-yellow-300 text-lg tracking-wide">
+										VICTORY THEME
+									</span>
+								</>
+							) : (
+								<>
+									<VolumeX className="h-8 w-8 text-gray-400" />
+									<span className="font-bold text-gray-400 text-lg tracking-wide">
+										MUTED
+									</span>
+								</>
+							)}
+						</button>
+					</div>
+				)}
+
 				{/* Winner announcement */}
 				<div className="text-center mb-12">
 					<div className="text-8xl mb-6">🏆</div>
-					<h1 className="text-6xl font-bold mb-8 text-yellow-300">GAME OVER!</h1>
+					<h1 className="text-6xl font-bold mb-8 text-yellow-300">
+						GAME OVER!
+					</h1>
 					{winner && (
 						<div className="beveled-box inline-block">
 							<div className="bevel-outer" />
@@ -221,13 +272,26 @@ function GameRecap() {
 							<span className="text-xl">HOME</span>
 						</div>
 					</Link>
-					<Link to="/create" className="n64-button">
-						<div className="n64-button-shadow bg-gradient-to-b from-purple-600 to-purple-800" />
-						<div className="n64-button-face bg-gradient-to-b from-purple-500 to-purple-700 border-purple-900 px-8 py-4 text-cyan-300 flex items-center gap-3">
-							<RotateCcw className="h-6 w-6" />
-							<span className="text-xl">NEW GAME</span>
-						</div>
-					</Link>
+					{/* New Game Button (Host Only) */}
+					{isHost && (
+						<Link to="/create" className="n64-button">
+							<div className="n64-button-shadow bg-gradient-to-b from-purple-600 to-purple-800" />
+							<div className="n64-button-face bg-gradient-to-b from-purple-500 to-purple-700 border-purple-900 px-8 py-4 text-cyan-300 flex items-center gap-3">
+								<RotateCcw className="h-6 w-6" />
+								<span className="text-xl">CREATE NEW GAME</span>
+							</div>
+						</Link>
+					)}
+					{/* Join Game Button (Player Only) */}
+					{!isHost && (
+						<Link to="/join" className="n64-button">
+							<div className="n64-button-shadow bg-gradient-to-b from-green-600 to-green-800" />
+							<div className="n64-button-face bg-gradient-to-b from-green-500 to-green-700 border-green-900 px-8 py-4 text-yellow-300 flex items-center gap-3">
+								<Users className="h-6 w-6" />
+								<span className="text-xl">JOIN NEW GAME</span>
+							</div>
+						</Link>
+					)}
 				</div>
 			</main>
 		</div>
