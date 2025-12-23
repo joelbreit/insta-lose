@@ -4,6 +4,7 @@ const {
 	GetCommand,
 	PutCommand,
 } = require("@aws-sdk/lib-dynamodb");
+const { broadcastToGame } = require("../shared/broadcast");
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -255,6 +256,14 @@ exports.handler = async (event) => {
 		});
 
 		await docClient.send(putCommand);
+
+		// Broadcast game start to all connected clients
+		try {
+			await broadcastToGame(gameId, updatedGame);
+		} catch (broadcastError) {
+			// Log but don't fail the request if broadcast fails
+			console.error("Failed to broadcast game start:", broadcastError);
+		}
 
 		return {
 			statusCode: 200,

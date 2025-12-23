@@ -7,7 +7,13 @@ set -e
 REGION="${AWS_REGION:-us-east-1}"
 PROJECT_NAME="insta-lose"
 TABLE_NAME="InstaLoseGames"
+CONNECTIONS_TABLE_NAME="InstaLoseConnections"
 ROLE_ARN=$(cat scripts/output/lambda-role-arn.txt 2>/dev/null)
+
+# Get WebSocket endpoint if available
+WS_ENDPOINT=$(cat scripts/output/websocket-endpoint.txt 2>/dev/null || echo "")
+# Convert wss:// to https:// for API Gateway Management API
+WS_API_ENDPOINT=$(echo "$WS_ENDPOINT" | sed 's|wss://|https://|')
 
 if [ -z "$ROLE_ARN" ]; then
     ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
@@ -15,13 +21,29 @@ if [ -z "$ROLE_ARN" ]; then
 fi
 
 echo "Using role: $ROLE_ARN"
+if [ -n "$WS_API_ENDPOINT" ]; then
+    echo "WebSocket endpoint: $WS_API_ENDPOINT"
+fi
 
 # Lambda functions to deploy
+# Functions that need broadcast capability are marked
 FUNCTIONS=("createGame" "joinGame" "getGameState" "startGame" "takeAction")
+BROADCAST_FUNCTIONS=("joinGame" "startGame" "takeAction")
 
 # Create temp directory for packaging
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
+
+# Check if function needs broadcast capability
+needs_broadcast() {
+    local func_name=$1
+    for bf in "${BROADCAST_FUNCTIONS[@]}"; do
+        if [ "$bf" = "$func_name" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
 
 deploy_function() {
     local func_name=$1
@@ -44,9 +66,31 @@ deploy_function() {
     # Copy source
     cp "$source_dir/index.js" "$pkg_dir/"
     
+    # If function needs broadcast, copy shared module
+    if needs_broadcast "$func_name"; then
+        echo "  Including broadcast module..."
+        mkdir -p "$pkg_dir/shared"
+        cp "src/lambda/shared/broadcast.js" "$pkg_dir/shared/"
+    fi
+    
     # Install dependencies (AWS SDK v3)
     cd "$pkg_dir"
-    cat > package.json << 'EOF'
+    
+    # Different package.json based on broadcast needs
+    if needs_broadcast "$func_name"; then
+        cat > package.json << 'EOF'
+{
+  "name": "lambda-function",
+  "version": "1.0.0",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.0.0"
+  }
+}
+EOF
+    else
+        cat > package.json << 'EOF'
 {
   "name": "lambda-function",
   "version": "1.0.0",
@@ -56,6 +100,8 @@ deploy_function() {
   }
 }
 EOF
+    fi
+    
     npm install --production --silent
     
     # Create zip
@@ -63,6 +109,15 @@ EOF
     cd - > /dev/null
     
     local zip_file="$TEMP_DIR/${func_name}.zip"
+    
+    # Build environment variables
+    local env_vars="TABLE_NAME=$TABLE_NAME"
+    if needs_broadcast "$func_name"; then
+        env_vars="TABLE_NAME=$TABLE_NAME,CONNECTIONS_TABLE_NAME=$CONNECTIONS_TABLE_NAME"
+        if [ -n "$WS_API_ENDPOINT" ]; then
+            env_vars="$env_vars,WEBSOCKET_ENDPOINT=$WS_API_ENDPOINT"
+        fi
+    fi
     
     # Check if function exists
     if aws lambda get-function --function-name "$lambda_name" --region "$REGION" > /dev/null 2>&1; then
@@ -101,7 +156,7 @@ EOF
         # Update configuration
         aws lambda update-function-configuration \
             --function-name "$lambda_name" \
-            --environment "Variables={TABLE_NAME=$TABLE_NAME}" \
+            --environment "Variables={$env_vars}" \
             --timeout 30 \
             --region "$REGION" > /dev/null
     else
@@ -112,7 +167,7 @@ EOF
             --role "$ROLE_ARN" \
             --handler "index.handler" \
             --zip-file "fileb://${zip_file}" \
-            --environment "Variables={TABLE_NAME=$TABLE_NAME}" \
+            --environment "Variables={$env_vars}" \
             --timeout 30 \
             --region "$REGION" > /dev/null
     fi
@@ -134,3 +189,10 @@ done
 
 echo ""
 echo "All Lambda functions deployed successfully!"
+
+if [ -z "$WS_API_ENDPOINT" ]; then
+    echo ""
+    echo "NOTE: WebSocket endpoint not configured."
+    echo "Run ./scripts/setup-websocket.sh first, then re-run this script"
+    echo "to enable real-time broadcasts."
+fi

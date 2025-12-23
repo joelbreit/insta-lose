@@ -4,6 +4,7 @@ const {
 	GetCommand,
 	PutCommand,
 } = require("@aws-sdk/lib-dynamodb");
+const { broadcastToGame } = require("../shared/broadcast");
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -326,6 +327,16 @@ exports.handler = async (event) => {
 		});
 
 		await docClient.send(putCommand);
+
+		// Broadcast updated game state to all connected clients
+		try {
+			await broadcastToGame(gameId, updatedGame, {
+				actionResult: action.peekedCards ? { playerId, peekedCards: action.peekedCards } : null,
+			});
+		} catch (broadcastError) {
+			// Log but don't fail the request if broadcast fails
+			console.error("Failed to broadcast game state:", broadcastError);
+		}
 
 		// Return filtered response
 		const response = {
