@@ -21,10 +21,11 @@ npm run lint            # Run ESLint
 ```bash
 # Setup (run in order)
 ./scripts/setup-iam.sh           # Create IAM role for Lambda
-./scripts/setup-dynamodb.sh      # Create DynamoDB table
-./scripts/setup-api-gateway.sh   # Create API Gateway
-./scripts/deploy-lambdas.sh      # Deploy all Lambda functions
-./scripts/generate-config.sh     # Generate src/config.js with API URL
+./scripts/setup-dynamodb.sh      # Create DynamoDB table (InstaLoseGames)
+./scripts/deploy-lambdas.sh      # Deploy REST Lambda functions
+./scripts/setup-api-gateway.sh   # Create REST API Gateway
+./scripts/setup-websocket.sh     # Setup WebSocket infrastructure (connections table, WS Lambdas, WS API Gateway)
+./scripts/generate-config.sh     # Generate src/config.js with API URLs
 
 # Teardown
 ./scripts/teardown-aws.sh        # Remove all AWS resources
@@ -42,9 +43,10 @@ npm run lint            # Run ESLint
 - Utils contain pure functions (`gameUtils.js`, `cardTypes.js`)
 
 **Backend** (AWS Lambda + DynamoDB):
-- 5 Lambda functions in `src/lambda/` (one folder per endpoint)
-- Single DynamoDB table `InstaLoseGames` stores entire game state by `gameId`
-- API Gateway exposes REST endpoints at `/prod/{functionName}`
+- 8 Lambda functions in `src/lambda/` (5 REST + 3 WebSocket handlers)
+- DynamoDB tables: `InstaLoseGames` (game state), `InstaLoseConnections` (WebSocket connections)
+- REST API Gateway exposes endpoints at `/prod/{path}`
+- WebSocket API Gateway for real-time game state broadcasts
 
 ### Lambda Functions
 
@@ -54,13 +56,18 @@ Each Lambda function follows this pattern:
 3. Read/write DynamoDB game state
 4. Return response with CORS headers
 
-| Function | Method | Purpose |
-|----------|--------|---------|
-| `createGame` | POST | Generate 6-char game code, create game in `waiting` status |
-| `joinGame` | POST | Add player to `players` array (max 100, prevents duplicates) |
-| `startGame` | POST | Build deck, deal cards, randomize turn order → `in-progress` |
-| `getGameState` | POST | Poll for updates (filters hands by playerId, returns 304 if unchanged) |
-| `takeAction` | POST | Execute player actions (`draw` or `playCard`) and advance game state |
+| Function | Type | Purpose |
+|----------|------|---------|
+| `createGame` | REST | Generate 6-char game code, create game in `waiting` status |
+| `joinGame` | REST | Add player to `players` array, broadcasts update via WebSocket |
+| `startGame` | REST | Build deck, deal cards, randomize turn order → `in-progress`, broadcasts |
+| `getGameState` | REST | Get current game state (initial load, filters hands by playerId) |
+| `takeAction` | REST | Execute player actions (`draw` or `playCard`), broadcasts update |
+| `onConnect` | WS | Store WebSocket connection in `InstaLoseConnections` table |
+| `onDisconnect` | WS | Remove connection from table on client disconnect |
+| `onDefault` | WS | Handle unexpected messages (no-op in v1) |
+
+**Shared Module**: `src/lambda/shared/broadcast.js` - Utility for broadcasting game state to all WebSocket connections in a game.
 
 ### Game State Structure
 
@@ -98,11 +105,12 @@ Each Lambda function follows this pattern:
 
 **Deck Building**: `(numPlayers × 6) + (numPlayers × 5) + (numPlayers - 1) Insta-Lose` plus random distribution of other card types.
 
-### State Management & Polling
+### State Management & Real-time Updates
 
 - **No global state library**: Uses React hooks + localStorage
-- **Polling pattern**: Frontend polls `getGameState` every 2 seconds
-- **304 Optimization**: Server returns 304 if `updatedAt` hasn't changed since `lastUpdatedAt` query param
+- **WebSocket pattern**: Frontend connects via WebSocket on page mount, receives server-pushed game state updates
+- **REST for actions**: Game actions (draw, play card) still go through REST API; Lambda broadcasts result via WebSocket
+- **Initial load**: Uses REST `getGameState` for immediate state on page load
 - **Identity persistence**: localStorage stores `{ playerId, name, icon, color, gameId }` for players or `{ hostPlayerId, gameId, isHost: true }` for host
 
 ### Music System
@@ -120,7 +128,7 @@ Recent addition for enhanced player experience:
 
 1. **Host as Spectator**: Host creates game but doesn't play. First joining player becomes "MVP" who can start the game. Simplifies game mechanics.
 
-2. **Turn-Based Polling**: 2-second polling intervals with 304 optimization is sufficient for turn-based gameplay. Avoids WebSocket complexity.
+2. **WebSocket for Real-time**: Server pushes game state updates via WebSocket. REST API handles actions, Lambda broadcasts results. Connection info stored in separate DynamoDB table (`InstaLoseConnections`).
 
 3. **Hand Filtering**: `getGameState` returns `cardCount` for other players but only sends full `hand` for requesting playerId. Prevents cheating via network inspection.
 
@@ -175,6 +183,7 @@ return response.json();
 ## Configuration
 
 - **API URL**: Auto-generated in `src/config.js` by `scripts/generate-config.sh`
-- **DynamoDB Table**: `InstaLoseGames` (single table design)
+- **WebSocket URL**: Auto-generated in `src/config.js` by `scripts/generate-config.sh`
+- **DynamoDB Tables**: `InstaLoseGames` (game state), `InstaLoseConnections` (WebSocket connections)
 - **Region**: `us-east-1` (hardcoded in scripts)
 - **Music URLs**: Configured in `src/services/musicService.js`
