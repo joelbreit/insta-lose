@@ -11,6 +11,7 @@
   - [x] Add more icons and colors to choose from
   - [x] Lucid React Icons
 - [x] UI: on the host game screen, show a visualization of all the players
+- [x] UI: fit entire dashboard onto one host screen
 - [ ] UI: on the host game screen, show a visualization of the deck and discard pile as stacks of cards
 - [x] UI: make it more clear when it is/is not your turn
 - [x] Game: Don't show what cards people drew on the host screen, lol

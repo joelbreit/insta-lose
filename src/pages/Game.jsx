@@ -488,95 +488,103 @@ function Game() {
 
 			{/* Main game area */}
 			<div className="flex-1 flex flex-col p-4">
-				{/* SPECTATOR BILLBOARD VIEW - Only for Host */}
+				{/* SPECTATOR VIEW - Only for Host */}
 				{isHost ? (
-					<div className="max-w-7xl mx-auto w-full space-y-6">
-						{/* Current Turn - HUGE */}
-						<div className="text-center mb-8">
-							<div className="inline-block px-16 py-8 bg-gradient-to-b from-yellow-600 to-yellow-800 border-8 border-yellow-900 animate-pulse">
-								<div className="text-5xl font-bold text-black tracking-wider mb-2">
-									CURRENT TURN
+					<div className="max-w-7xl mx-auto w-full h-full flex gap-4">
+						{/* Left side - Card piles and Players */}
+						<div className="flex-1 flex flex-col gap-4">
+							{/* Card Piles - styled like stacked cards */}
+							<div className="flex items-start gap-6">
+								{/* Draw Pile Stack */}
+								<div className="relative">
+									{/* Stack effect - bottom cards */}
+									<div className="absolute top-2 left-1 w-20 h-28 bg-gray-800 border-4 border-gray-900 rounded-sm" />
+									<div className="absolute top-1 left-0.5 w-20 h-28 bg-gray-700 border-4 border-gray-800 rounded-sm" />
+									{/* Top card */}
+									<div className="relative w-20 h-28 bg-gradient-to-br from-blue-600 to-blue-800 border-4 border-blue-900 rounded-sm flex flex-col items-center justify-center shadow-lg">
+										<Layers
+											className="w-8 h-8 text-cyan-300"
+											strokeWidth={2.5}
+										/>
+										<div className="text-2xl font-bold text-yellow-300 mt-1">
+											{gameState.deckCount}
+										</div>
+									</div>
+									<div className="text-center mt-2 text-sm font-bold text-cyan-300 tracking-wide">
+										DRAW
+									</div>
 								</div>
-								<div className="text-7xl font-bold text-black tracking-widest">
-									{(
-										gameState.players.find(
-											(p) =>
-												p.playerId ===
+
+								{/* Discard Pile Stack */}
+								<div className="relative">
+									{/* Stack effect - bottom cards (fewer) */}
+									{gameState.discardPileCount > 1 && (
+										<div className="absolute top-1 left-0.5 w-20 h-28 bg-gray-600 border-4 border-gray-700 rounded-sm" />
+									)}
+									{/* Top card */}
+									<div className="relative w-20 h-28 bg-gradient-to-br from-gray-500 to-gray-700 border-4 border-gray-800 rounded-sm flex flex-col items-center justify-center shadow-lg">
+										<Trash2
+											className="w-8 h-8 text-gray-300"
+											strokeWidth={2.5}
+										/>
+										<div className="text-2xl font-bold text-yellow-300 mt-1">
+											{gameState.discardPileCount}
+										</div>
+									</div>
+									<div className="text-center mt-2 text-sm font-bold text-gray-400 tracking-wide">
+										DISCARD
+									</div>
+								</div>
+
+								{/* Current Turn indicator - compact */}
+								<div className="ml-auto px-6 py-3 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900">
+									<div className="text-sm font-bold text-black tracking-wide">
+										CURRENT TURN
+									</div>
+									<div className="text-2xl font-bold text-black tracking-wider">
+										{(
+											gameState.players.find(
+												(p) =>
+													p.playerId ===
+													gameState.currentTurnPlayerId
+											)?.name || "..."
+										).toUpperCase()}
+									</div>
+								</div>
+							</div>
+
+							{/* Players Circle - takes remaining space */}
+							<div className="flex-1 beveled-box">
+								<div className="bevel-outer" />
+								<div className="bevel-inner" />
+								<div className="bevel-content p-4 h-full flex flex-col">
+									<div className="text-xl font-bold text-cyan-300 tracking-wider mb-2 text-center">
+										PLAYERS
+									</div>
+									<div className="flex-1 flex items-center justify-center">
+										<PlayerCircle
+											players={gameState.players}
+											currentTurnPlayerId={
 												gameState.currentTurnPlayerId
-										)?.name || "..."
-									).toUpperCase()}
+											}
+											showCardCount
+										/>
+									</div>
 								</div>
 							</div>
 						</div>
 
-						{/* Game Stats - Two Column */}
-						<div className="grid grid-cols-2 gap-6">
-							{/* Draw Pile */}
-							<div className="beveled-box">
-								<div className="bevel-outer" />
-								<div className="bevel-inner" />
-								<div className="bevel-content p-8 text-center">
-									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">
-										DRAW PILE
-									</div>
-									<div className="text-8xl font-bold text-yellow-300 mb-4">
-										{gameState.deckCount}
-									</div>
-									<Layers
-										className="w-16 h-16 text-yellow-300 mx-auto"
-										strokeWidth={2.5}
-									/>
-								</div>
-							</div>
-
-							{/* Discard Pile */}
-							<div className="beveled-box">
-								<div className="bevel-outer" />
-								<div className="bevel-inner" />
-								<div className="bevel-content p-8 text-center">
-									<div className="text-3xl font-bold text-cyan-300 tracking-wider mb-4">
-										DISCARD PILE
-									</div>
-									<div className="text-8xl font-bold text-yellow-300 mb-4">
-										{gameState.discardPileCount}
-									</div>
-									<Trash2
-										className="w-16 h-16 text-yellow-300 mx-auto"
-										strokeWidth={2.5}
-									/>
-								</div>
-							</div>
-						</div>
-
-						{/* Players Circle */}
-						<div className="beveled-box">
+						{/* Right side - Recent Actions */}
+						<div className="w-72 beveled-box flex-shrink-0">
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
-							<div className="bevel-content p-8">
-								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">
-									PLAYERS
-								</div>
-								<PlayerCircle
-									players={gameState.players}
-									currentTurnPlayerId={
-										gameState.currentTurnPlayerId
-									}
-									showCardCount
-								/>
-							</div>
-						</div>
-
-						{/* Recent Actions - Activity Feed */}
-						<div className="beveled-box">
-							<div className="bevel-outer" />
-							<div className="bevel-inner" />
-							<div className="bevel-content p-8">
-								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">
+							<div className="bevel-content p-4 h-full flex flex-col">
+								<div className="text-lg font-bold text-cyan-300 tracking-wider mb-3 text-center">
 									RECENT ACTIONS
 								</div>
-								<div className="space-y-3">
+								<div className="flex-1 overflow-y-auto space-y-2">
 									{gameState.actions
-										.slice(-8)
+										.slice(-10)
 										.reverse()
 										.map((action, i) => {
 											const actionPlayer =
@@ -588,7 +596,7 @@ function Game() {
 											return (
 												<div
 													key={i}
-													className="flex items-center gap-4 p-4 bg-gray-900 border-4 border-gray-600"
+													className="flex items-center gap-2 p-2 bg-gray-900 border-2 border-gray-600"
 												>
 													{actionPlayer && (
 														<PlayerIcon
@@ -598,31 +606,27 @@ function Game() {
 															colorName={
 																actionPlayer.color
 															}
-															size="md"
+															size="sm"
 														/>
 													)}
-													<div className="flex-1">
-														<div className="text-2xl font-bold text-green-300 tracking-wide">
+													<div className="flex-1 min-w-0">
+														<div className="text-sm font-bold text-green-300 tracking-wide truncate">
 															{(
 																actionPlayer?.name ||
 																"HOST"
 															).toUpperCase()}
-															:{" "}
-															{action.type.toUpperCase()}
 														</div>
-														{/* If draw, and not I'm not the player who drew the card, replace cardType with "CARD" */}
-														{action.type ===
-															"draw" &&
-														action.playerId !==
-															player?.playerId ? (
-															<div className="text-xl text-gray-400 font-bold tracking-wide">
-																CARD
-															</div>
-														) : action.cardType ? (
-															<div className="text-xl text-yellow-300 font-bold tracking-wide">
-																{action.cardType.toUpperCase()}
-															</div>
-														) : null}
+														<div className="text-xs text-yellow-300 font-bold tracking-wide">
+															{action.type.toUpperCase()}
+															{action.type ===
+																"draw" &&
+															action.playerId !==
+																player?.playerId
+																? ""
+																: action.cardType
+																? `: ${action.cardType.toUpperCase()}`
+																: ""}
+														</div>
 													</div>
 												</div>
 											);
