@@ -17,7 +17,7 @@
 - [ ] UX: make game codes 4 characters long
 - [ ] UI: give tracks names rather than numbers
 - [x] UI: remove dashed red border from unplayable cards
-- [ ] Music: automatically play the theme when the game ends
+- [x] Music: automatically play the theme when the game ends
 - [x] UI: add footer to all pages
 - [ ] Refactor: Waiting room/game/recap could all be the same page
 - [ ] Refactor: address linting issues

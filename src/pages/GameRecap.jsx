@@ -26,7 +26,18 @@ function GameRecap() {
 	const [error, setError] = useState(null);
 
 	useGameEndMusic();
-	const { isPlaying, pause, playTheme } = useMusic();
+	const { isPlaying, pause, playTheme, stop } = useMusic();
+
+	// Auto-start theme song game recap loads
+	useEffect(() => {
+		if (isHost) {
+			playTheme();
+		}
+
+		return () => {
+			stop();
+		};
+	}, [isHost]);
 
 	useEffect(() => {
 		const storedPlayer = localStorage.getItem("player");
