@@ -490,7 +490,7 @@ function Game() {
 			<div className="flex-1 flex flex-col p-4">
 				{/* SPECTATOR VIEW - Only for Host */}
 				{isHost ? (
-					<div className="max-w-7xl mx-auto w-full h-full flex gap-4">
+					<div className="mx-auto w-full h-full flex gap-4">
 						{/* Left side - Card piles and Players */}
 						<div className="flex-1 flex flex-col gap-4">
 							{/* Card Piles - styled like stacked cards */}
