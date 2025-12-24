@@ -10,15 +10,17 @@
   - [x] Make one button that when selected, brings up other options
   - [x] Add more icons and colors to choose from
   - [x] Lucid React Icons
-- [ ] UI: on the host game screen, show a visualization of all the players
+- [x] UI: on the host game screen, show a visualization of all the players
 - [ ] UI: on the host game screen, show a visualization of the deck and discard pile as stacks of cards
-- [ ] UI: make it more clear when it is/is not your turn
+- [x] UI: make it more clear when it is/is not your turn
 - [x] Game: Don't show what cards people drew on the host screen, lol
 - [ ] UX: make game codes 4 characters long
 - [ ] UI: give tracks names rather than numbers
-- [ ] UI: remove dashed red border from unplayable cards
+- [x] UI: remove dashed red border from unplayable cards
 - [ ] Music: automatically play the theme when the game ends
 - [x] UI: add footer to all pages
 - [ ] Refactor: Waiting room/game/recap could all be the same page
 - [ ] Refactor: address linting issues
-- [ ] Add credits page
+- [ ] UI: add credits page
+- [ ] Architecture: audit for abandonded AWS resources
+- [ ] UI: group players actions into turns on recent actions display

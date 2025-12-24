@@ -15,6 +15,7 @@ import {
 import { useGameEndMusic } from "../hooks/useMusic";
 import { useMusic } from "../hooks/useMusic";
 import { PlayerIcon } from "../components/PlayerIcon";
+import N64Button from "../components/N64Button";
 
 function GameRecap() {
 	const { gameId } = useParams();
@@ -261,33 +262,30 @@ function GameRecap() {
 
 				{/* Actions */}
 				<div className="flex gap-6 justify-center">
-					<Link to="/" className="n64-button">
-						<div className="n64-button-shadow bg-gradient-to-b from-gray-600 to-gray-800" />
-						<div className="n64-button-face bg-gradient-to-b from-gray-500 to-gray-700 border-gray-900 px-8 py-4 text-yellow-300 flex items-center gap-3">
-							<Home className="h-6 w-6" />
-							<span className="text-xl">HOME</span>
+					{/* New Game Button */}
+					{/* {isHost && ( */}
+					<N64Button
+						color="purple"
+						asLink
+						to={isHost ? "/create" : "/join"}
+					>
+						<div className="flex items-center gap-3">
+							<RotateCcw className="h-6 w-6" />
+							<span className="text-xl">
+								{isHost ? "CREATE NEW GAME" : "JOIN NEW GAME"}
+							</span>
 						</div>
-					</Link>
-					{/* New Game Button (Host Only) */}
-					{isHost && (
-						<Link to="/create" className="n64-button">
-							<div className="n64-button-shadow bg-gradient-to-b from-purple-600 to-purple-800" />
-							<div className="n64-button-face bg-gradient-to-b from-purple-500 to-purple-700 border-purple-900 px-8 py-4 text-cyan-300 flex items-center gap-3">
-								<RotateCcw className="h-6 w-6" />
-								<span className="text-xl">CREATE NEW GAME</span>
-							</div>
-						</Link>
-					)}
+					</N64Button>
+					{/* )} */}
 					{/* Join Game Button (Player Only) */}
-					{!isHost && (
-						<Link to="/join" className="n64-button">
-							<div className="n64-button-shadow bg-gradient-to-b from-green-600 to-green-800" />
-							<div className="n64-button-face bg-gradient-to-b from-green-500 to-green-700 border-green-900 px-8 py-4 text-yellow-300 flex items-center gap-3">
-								<Users className="h-6 w-6" />
+					{/* {!isHost && (
+						<N64Button color="purple" asLink to="/join">
+							<div className="flex items-center gap-3">
+								<RotateCcw className="h-6 w-6" />
 								<span className="text-xl">JOIN NEW GAME</span>
 							</div>
-						</Link>
-					)}
+						</N64Button>
+					)} */}
 				</div>
 			</main>
 		</div>

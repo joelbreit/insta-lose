@@ -82,8 +82,8 @@ function CardHand({
 							} ${isNotPlayable ? "opacity-60" : ""}`}
 							style={{
 								boxShadow: isSelected
-									? '0 8px 0 #000'
-									: '0 4px 0 #000'
+									? "0 8px 0 #000"
+									: "0 4px 0 #000",
 							}}
 							title={
 								isNotPlayable
@@ -94,7 +94,10 @@ function CardHand({
 							}
 						>
 							{cardType?.icon ? (
-								<cardType.icon className="w-8 h-8" strokeWidth={2.5} />
+								<cardType.icon
+									className="w-8 h-8"
+									strokeWidth={2.5}
+								/>
 							) : (
 								<span className="text-3xl">?</span>
 							)}
@@ -110,7 +113,7 @@ function CardHand({
 							)}
 							{/* Visual indicator for unplayable cards */}
 							{isNotPlayable && (
-								<div className="absolute inset-0 border-4 border-red-500 border-dashed opacity-80" />
+								<div className="absolute inset-0 border-4 border-gray-500 border-dashed opacity-80" />
 							)}
 						</button>
 					);
@@ -132,16 +135,24 @@ function CardHand({
 								<div className="bevel-content p-8">
 									<div className="flex items-center gap-4 mb-6">
 										{cardType?.icon ? (
-											<cardType.icon className="w-16 h-16" strokeWidth={2.5} />
+											<cardType.icon
+												className="w-16 h-16"
+												strokeWidth={2.5}
+											/>
 										) : (
 											<span className="text-5xl">?</span>
 										)}
 										<h3 className="text-2xl font-bold text-yellow-300 tracking-wide">
-											{(cardType?.name || showInfo.type).toUpperCase()}
+											{(
+												cardType?.name || showInfo.type
+											).toUpperCase()}
 										</h3>
 									</div>
 									<p className="text-cyan-300 text-lg tracking-wide leading-relaxed mb-8">
-										{(cardType?.description || "NO DESCRIPTION AVAILABLE.").toUpperCase()}
+										{(
+											cardType?.description ||
+											"NO DESCRIPTION AVAILABLE."
+										).toUpperCase()}
 									</p>
 									<button
 										onClick={() => setShowInfo(null)}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PlayerList from "../components/PlayerList";
+import PlayerCircle from "../components/PlayerCircle";
 import CardHand from "../components/CardHand";
 import { getGameState, takeAction } from "../services/api";
 import { gameWebSocket } from "../services/websocket";
@@ -547,7 +548,7 @@ function Game() {
 							</div>
 						</div>
 
-						{/* Players */}
+						{/* Players Circle */}
 						<div className="beveled-box">
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
@@ -555,7 +556,7 @@ function Game() {
 								<div className="text-4xl font-bold text-cyan-300 tracking-wider mb-6 text-center">
 									PLAYERS
 								</div>
-								<PlayerList
+								<PlayerCircle
 									players={gameState.players}
 									currentTurnPlayerId={
 										gameState.currentTurnPlayerId
@@ -617,11 +618,11 @@ function Game() {
 															<div className="text-xl text-gray-400 font-bold tracking-wide">
 																CARD
 															</div>
-														) : (
+														) : action.cardType ? (
 															<div className="text-xl text-yellow-300 font-bold tracking-wide">
 																{action.cardType.toUpperCase()}
 															</div>
-														)}
+														) : null}
 													</div>
 												</div>
 											);
@@ -782,17 +783,19 @@ function Game() {
 							)}
 						</div>
 
-						{/* Player list (compact) */}
+						{/* Player circle (compact) */}
 						<div className="beveled-box mb-8">
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
 							<div className="bevel-content p-6">
-								<PlayerList
+								<PlayerCircle
 									players={gameState.players}
 									currentTurnPlayerId={
 										gameState.currentTurnPlayerId
 									}
+									currentPlayerId={player?.playerId}
 									showCardCount
+									compact
 								/>
 							</div>
 						</div>
@@ -855,8 +858,8 @@ function Game() {
 						disabled={isActing}
 						className="n64-button mx-auto mb-8 block"
 					>
-						<div className="n64-button-shadow bg-gradient-to-b from-red-600 to-red-800" />
-						<div className="n64-button-face bg-gradient-to-b from-red-500 to-red-700 border-red-900 px-16 py-6 text-yellow-300">
+						<div className="n64-button-shadow bg-gradient-to-b from-green-600 to-green-800" />
+						<div className="n64-button-face bg-gradient-to-b from-green-500 to-green-700 border-green-900 px-16 py-6 text-yellow-300">
 							<div className="flex items-center justify-center gap-3">
 								{!isActing && (
 									<Layers
