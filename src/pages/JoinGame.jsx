@@ -87,7 +87,7 @@ function JoinGame() {
 							onChange={(e) =>
 								setGameId(e.target.value.toUpperCase())
 							}
-							placeholder="XRAY42"
+							placeholder="XRAY"
 							maxLength={6}
 							className="w-full px-6 py-4 text-3xl text-center tracking-widest font-mono bg-black border-4 border-cyan-500 text-yellow-300 outline-none focus:border-yellow-300"
 						/>

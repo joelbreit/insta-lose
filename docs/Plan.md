@@ -57,7 +57,7 @@
 
 ```json
 {
-  gameId: "XRAY42",
+  gameId: "XRAY",
   hostPlayerId: "player-uuid-1",
   status: "waiting" | "in-progress" | "finished",
   createdAt: 1234567890,
@@ -125,7 +125,7 @@
 **Output:**
 ```javascript
 {
-  gameId: "XRAY42",
+  gameId: "XRAY",
   game: { ...full game object... }
 }
 ```
@@ -178,7 +178,7 @@ For MVP, clients will poll this endpoint every 2 seconds to get the latest game 
 **Output:**
 ```javascript
 {
-  gameId: "XRAY42",
+  gameId: "XRAY",
   status: "in-progress",
   currentTurnPlayerId: "player-uuid-2",
   myHand: ["card-3", "card-7"], // Only this player's cards

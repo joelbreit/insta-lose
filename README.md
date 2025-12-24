@@ -8,7 +8,7 @@ Players can then join on other devices.
 
 ## Local Development
 
-> For full setup, run the scripts in the `scripts` folder, then copy from the output folder to `VITE_API_URL` and `VITE_WS_URL` in `.env`
+> For full setup, run the scripts in the `scripts` folder, then copy from the output folder to `VITE_API_URL` and `VITE_WS_URL` in `.env`. These values also needed added in the Amplify Console for the frontend to work.
 
 1. Install dependencies
 

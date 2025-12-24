@@ -45,14 +45,14 @@ Insta-Lose uses a serverless architecture on AWS to minimize costs and eliminate
 Single-table design storing all game state in one item per game.
 
 **Key Schema:**
-| Attribute     | Type   | Description                            |
-| ------------- | ------ | -------------------------------------- |
-| `gameId` (PK) | String | 6-character game code (e.g., "XRAY42") |
+| Attribute     | Type   | Description                          |
+| ------------- | ------ | ------------------------------------ |
+| `gameId` (PK) | String | 4-character game code (e.g., "XRAY") |
 
 **Item Structure:**
 ```json
 {
-  "gameId": "XRAY42",
+  "gameId": "XRAY",
   "hostPlayerId": "player-uuid-1",
   "status": "waiting | in-progress | finished",
   "createdAt": 1234567890,
@@ -110,7 +110,7 @@ Stores active WebSocket connections for real-time broadcasting.
 ```json
 {
   "connectionId": "ABC123xyz=",
-  "gameId": "XRAY42",
+  "gameId": "XRAY",
   "playerId": "player-uuid-1",
   "isHost": false,
   "connectedAt": 1234567890,
@@ -193,7 +193,7 @@ wss://{api-id}.execute-api.{region}.amazonaws.com/prod?gameId={gameId}&playerId=
 {
   "type": "gameStateUpdate",
   "data": {
-    "gameId": "XRAY42",
+    "gameId": "XRAY",
     "status": "in-progress",
     "currentTurnPlayerId": "player-uuid-2",
     "players": [...],
@@ -232,7 +232,7 @@ All functions use Node.js 20.x runtime with AWS SDK v3.
     "hostColor": "bg-blue-500"
   }
   ```
-- **Output:** `{ "gameId": "XRAY42", "game": {...} }`
+- **Output:** `{ "gameId": "XRAY", "game": {...} }`
 
 ##### 2. `insta-lose-joinGame`
 - **Trigger:** `POST /games/{gameId}/join`

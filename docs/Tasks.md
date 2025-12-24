@@ -15,7 +15,7 @@
 - [ ] UI: on the host game screen, show a visualization of the deck and discard pile as stacks of cards
 - [x] UI: make it more clear when it is/is not your turn
 - [x] Game: Don't show what cards people drew on the host screen, lol
-- [ ] UX: make game codes 4 characters long
+- [x] UX: make game codes 4 characters long
 - [ ] UI: give tracks names rather than numbers
 - [x] UI: remove dashed red border from unplayable cards
 - [x] Music: automatically play the theme when the game ends
