@@ -149,8 +149,7 @@ function GameRecap() {
 
 				{/* Winner announcement */}
 				<div className="text-center mb-12">
-					<div className="text-8xl mb-6">🏆</div>
-					<h1 className="text-6xl font-bold mb-8 text-yellow-300">
+					<h1 className="text-6xl font-bold mb-8 text-yellow-300 animate-pulse">
 						GAME OVER!
 					</h1>
 					{winner && (
@@ -226,7 +225,13 @@ function GameRecap() {
 											iconName={p.icon}
 											colorName={p.color}
 											size="lg"
-											variant={!p.isAlive ? "eliminated" : isPlayerWinner ? "winner" : "default"}
+											variant={
+												!p.isAlive
+													? "eliminated"
+													: isPlayerWinner
+													? "winner"
+													: "default"
+											}
 										/>
 										<div className="flex-1">
 											<div className="font-bold text-xl text-cyan-300 tracking-wide">
@@ -252,18 +257,6 @@ function GameRecap() {
 							})}
 						</div>
 					</div>
-				</div>
-
-				{/* Theme song link */}
-				<div className="text-center mb-12">
-					<a
-						href="https://suno.com/s/QFee4suGpweV5GXn"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-cyan-300 text-xl font-bold tracking-wide hover:text-cyan-400"
-					>
-						🎵 LISTEN TO THE VICTORY THEME
-					</a>
 				</div>
 
 				{/* Actions */}

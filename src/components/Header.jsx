@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Layers } from "lucide-react";
 
 function Header() {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,8 +13,9 @@ function Header() {
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="flex h-20 justify-between">
 					<div className="flex items-center">
-						<Link to="/" className="shrink-0 text-2xl font-bold text-yellow-300 tracking-widest" style={{ textShadow: '3px 3px 0px #000' }}>
-							🎴 INSTA-LOSE
+						<Link to="/" className="shrink-0 flex items-center gap-2 text-2xl font-bold text-yellow-300 tracking-widest" style={{ textShadow: '3px 3px 0px #000' }}>
+							<Layers className="w-6 h-6" strokeWidth={2.5} />
+							<span>INSTA-LOSE</span>
 						</Link>
 
 						{/* Desktop navigation */}

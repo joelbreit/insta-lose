@@ -93,9 +93,11 @@ function CardHand({
 									: undefined
 							}
 						>
-							<span className="text-3xl">
-								{cardType?.icon || "?"}
-							</span>
+							{cardType?.icon ? (
+								<cardType.icon className="w-8 h-8" strokeWidth={2.5} />
+							) : (
+								<span className="text-3xl">?</span>
+							)}
 							{/* If pairs, show the pair type */}
 							{card.type.startsWith("pairs-") ? (
 								<span className="text-sm font-bold text-center px-1 tracking-wide">
@@ -129,9 +131,11 @@ function CardHand({
 								<div className="bevel-inner" />
 								<div className="bevel-content p-8">
 									<div className="flex items-center gap-4 mb-6">
-										<span className="text-5xl">
-											{cardType?.icon || "?"}
-										</span>
+										{cardType?.icon ? (
+											<cardType.icon className="w-16 h-16" strokeWidth={2.5} />
+										) : (
+											<span className="text-5xl">?</span>
+										)}
 										<h3 className="text-2xl font-bold text-yellow-300 tracking-wide">
 											{(cardType?.name || showInfo.type).toUpperCase()}
 										</h3>

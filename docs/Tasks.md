@@ -1,8 +1,10 @@
 # Tasks
 
+- [x] UI: replace all emojis with icons
 - [x] Bug: URLs are being cached by browsers, so when you try to join a game, it sometimes goes to old game pages
 - [x] Music: music should not be included at all on non-host screens
-- [ ] Music: host should loop through in-game tracks when unmuted in waiting/game screens
+- [x] Music: host should loop through in-game tracks when unmuted in waiting/game screens
+- [ ] Music: track should advance to next track when switching from waiting room to game
 - [x] UI: Clean up choose icon/color
   - [x] Pick random to start
   - [x] Make one button that when selected, brings up other options

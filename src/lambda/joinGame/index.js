@@ -80,7 +80,7 @@ exports.handler = async (event) => {
 		const newPlayer = {
 			playerId,
 			name,
-			icon: icon || "🐶",
+			icon: icon || "cat",
 			color: color || "bg-pink-500",
 			hand: [],
 			isAlive: true,

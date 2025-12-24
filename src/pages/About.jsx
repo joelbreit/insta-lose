@@ -55,11 +55,15 @@ function About() {
 										key={key}
 										className="flex items-start gap-4 p-4 bg-gray-900 border-4 border-gray-600"
 									>
-										<div
-											className={`w-16 h-20 ${card.bgColor} border-4 border-black flex items-center justify-center text-3xl flex-shrink-0`}
-										>
-											{card.icon}
-										</div>
+									<div
+										className={`w-16 h-20 ${card.bgColor} border-4 border-black flex items-center justify-center flex-shrink-0`}
+									>
+										{card.icon ? (
+											<card.icon className="w-10 h-10 text-white" strokeWidth={2.5} />
+										) : (
+											<span className="text-3xl">?</span>
+										)}
+									</div>
 										<div>
 											<div className="font-bold text-xl text-yellow-300 tracking-wide mb-1">
 												{card.name.toUpperCase()}

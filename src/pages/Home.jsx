@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import N64Button from "../components/N64Button";
-import { Users, Plus } from "lucide-react";
+import { Users, Plus, Layers } from "lucide-react";
 
 function Home() {
 	return (
@@ -10,7 +10,10 @@ function Home() {
 
 			<main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
 				<div className="text-center mb-20">
-					<h1 className="text-7xl font-bold mb-6 text-yellow-300">🎴 INSTA-LOSE</h1>
+					<div className="flex items-center justify-center gap-4 mb-6">
+						<Layers className="w-16 h-16 text-yellow-300" strokeWidth={2.5} />
+						<h1 className="text-7xl font-bold text-yellow-300">INSTA-LOSE</h1>
+					</div>
 					<p className="text-3xl font-bold text-cyan-300 tracking-widest" style={{ textShadow: '2px 2px 0px #000' }}>
 						DON'T DRAW THE LOSING CARD!
 					</p>

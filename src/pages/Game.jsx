@@ -13,6 +13,10 @@ import {
 	SkipForward,
 	Wifi,
 	WifiOff,
+	Skull,
+	AlertCircle,
+	Eye,
+	Trash2,
 } from "lucide-react";
 import { useMusic } from "../hooks/useMusic";
 import Header from "../components/Header";
@@ -260,13 +264,15 @@ function Game() {
 				setActionResult({
 					type: "eliminated",
 					message:
-						"💀 You drew an Insta-Lose card and had no Panic card! You're out!",
+						"You drew an Insta-Lose card and had no Panic card! You're out!",
+					icon: Skull,
 				});
 			} else if (result.action?.result === "saved-by-panic") {
 				setActionResult({
 					type: "saved",
 					message:
-						"😱 You drew an Insta-Lose card but your Panic card saved you!",
+						"You drew an Insta-Lose card but your Panic card saved you!",
+					icon: AlertCircle,
 				});
 			}
 
@@ -338,9 +344,10 @@ function Game() {
 				);
 				setActionResult({
 					type: "steal",
-					message: `👯 You stole a card from ${
+					message: `You stole a card from ${
 						targetPlayer?.name || "another player"
 					}!`,
+					icon: Users,
 				});
 			}
 
@@ -514,7 +521,10 @@ function Game() {
 									<div className="text-8xl font-bold text-yellow-300 mb-4">
 										{gameState.deckCount}
 									</div>
-									<div className="text-4xl">🎴</div>
+									<Layers
+										className="w-16 h-16 text-yellow-300 mx-auto"
+										strokeWidth={2.5}
+									/>
 								</div>
 							</div>
 
@@ -529,7 +539,10 @@ function Game() {
 									<div className="text-8xl font-bold text-yellow-300 mb-4">
 										{gameState.discardPileCount}
 									</div>
-									<div className="text-4xl">🗑️</div>
+									<Trash2
+										className="w-16 h-16 text-yellow-300 mx-auto"
+										strokeWidth={2.5}
+									/>
 								</div>
 							</div>
 						</div>
@@ -578,8 +591,12 @@ function Game() {
 												>
 													{actionPlayer && (
 														<PlayerIcon
-															iconName={actionPlayer.icon}
-															colorName={actionPlayer.color}
+															iconName={
+																actionPlayer.icon
+															}
+															colorName={
+																actionPlayer.color
+															}
 															size="md"
 														/>
 													)}
@@ -587,7 +604,7 @@ function Game() {
 														<div className="text-2xl font-bold text-green-300 tracking-wide">
 															{(
 																actionPlayer?.name ||
-																"?"
+																"HOST"
 															).toUpperCase()}
 															:{" "}
 															{action.type.toUpperCase()}
@@ -628,9 +645,17 @@ function Game() {
 										: "bg-purple-900 border-purple-500"
 								}`}
 							>
-								<p className="text-xl font-bold text-yellow-300 tracking-wide mb-3">
-									{actionResult.message.toUpperCase()}
-								</p>
+								<div className="flex items-center justify-center gap-3 mb-3">
+									{actionResult.icon && (
+										<actionResult.icon
+											className="w-8 h-8 text-yellow-300"
+											strokeWidth={2.5}
+										/>
+									)}
+									<p className="text-xl font-bold text-yellow-300 tracking-wide">
+										{actionResult.message.toUpperCase()}
+									</p>
+								</div>
 								<button
 									onClick={() => setActionResult(null)}
 									className="px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold tracking-wide"
@@ -646,8 +671,12 @@ function Game() {
 								<div className="bevel-outer" />
 								<div className="bevel-inner" />
 								<div className="bevel-content p-6">
-									<div className="text-center text-cyan-300 font-bold text-xl tracking-wide mb-6">
-										👁️ TOP 3 CARDS OF THE DECK:
+									<div className="flex items-center justify-center gap-3 text-center text-cyan-300 font-bold text-xl tracking-wide mb-6">
+										<Eye
+											className="w-6 h-6"
+											strokeWidth={2.5}
+										/>
+										<span>TOP 3 CARDS OF THE DECK:</span>
 									</div>
 									<div className="flex justify-center gap-4">
 										{peekedCards.map((card) => {
@@ -672,9 +701,16 @@ function Game() {
 															"0 4px 0 #000",
 													}}
 												>
-													<span className="text-3xl">
-														{cardType?.icon || "?"}
-													</span>
+													{cardType?.icon ? (
+														<cardType.icon
+															className="w-8 h-8"
+															strokeWidth={2.5}
+														/>
+													) : (
+														<span className="text-3xl">
+															?
+														</span>
+													)}
 													{card.type.startsWith(
 														"pairs-"
 													) ? (
@@ -707,9 +743,13 @@ function Game() {
 						{/* Turn indicator */}
 						<div className="text-center mb-8">
 							{!isAlive ? (
-								<div className="inline-block px-10 py-4 bg-gradient-to-b from-red-600 to-red-800 border-4 border-red-900">
+								<div className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-b from-red-600 to-red-800 border-4 border-red-900">
+									<Skull
+										className="w-8 h-8 text-yellow-300"
+										strokeWidth={2.5}
+									/>
 									<span className="text-2xl font-bold text-yellow-300 tracking-wider">
-										💀 ELIMINATED
+										ELIMINATED
 									</span>
 								</div>
 							) : isMyTurn ? (
@@ -760,8 +800,9 @@ function Game() {
 						<div className="bevel-outer" />
 						<div className="bevel-inner" />
 						<div className="bevel-content p-6">
-							<div className="text-center text-yellow-300 font-bold text-2xl tracking-wide mb-6">
-								👯 CHOOSE A PLAYER TO STEAL FROM:
+							<div className="flex items-center justify-center gap-3 text-center text-yellow-300 font-bold text-2xl tracking-wide mb-6">
+								<Users className="w-8 h-8" strokeWidth={2.5} />
+								<span>CHOOSE A PLAYER TO STEAL FROM:</span>
 							</div>
 							<div className="flex flex-wrap justify-center gap-4">
 								{otherAlivePlayers.map((p) => (
@@ -808,9 +849,17 @@ function Game() {
 					>
 						<div className="n64-button-shadow bg-gradient-to-b from-red-600 to-red-800" />
 						<div className="n64-button-face bg-gradient-to-b from-red-500 to-red-700 border-red-900 px-16 py-6 text-yellow-300">
-							<span className="text-3xl font-bold">
-								{isActing ? "..." : "🎴 DRAW CARD"}
-							</span>
+							<div className="flex items-center justify-center gap-3">
+								{!isActing && (
+									<Layers
+										className="w-8 h-8"
+										strokeWidth={2.5}
+									/>
+								)}
+								<span className="text-3xl font-bold">
+									{isActing ? "..." : "DRAW CARD"}
+								</span>
+							</div>
 						</div>
 					</button>
 				)}
@@ -895,7 +944,7 @@ function Game() {
 													>
 														{(
 															actionPlayer?.name ||
-															"?"
+															"HOST"
 														).toUpperCase()}
 														:{" "}
 														{action.type.toUpperCase()}

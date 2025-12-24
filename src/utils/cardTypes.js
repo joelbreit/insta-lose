@@ -1,7 +1,9 @@
+import { Skull, AlertCircle, Users, Eye, SkipForward, Shuffle } from "lucide-react";
+
 export const CARD_TYPES = {
 	"insta-lose": {
 		name: "Insta-Lose",
-		icon: "💀",
+		icon: Skull,
 		bgColor: "bg-red-600",
 		textColor: "text-white",
 		description:
@@ -9,7 +11,7 @@ export const CARD_TYPES = {
 	},
 	panic: {
 		name: "Panic",
-		icon: "😱",
+		icon: AlertCircle,
 		bgColor: "bg-amber-500",
 		textColor: "text-white",
 		description:
@@ -17,7 +19,7 @@ export const CARD_TYPES = {
 	},
 	pairs: {
 		name: "Pairs",
-		icon: "👯",
+		icon: Users,
 		bgColor: "bg-purple-500",
 		textColor: "text-white",
 		description:
@@ -25,7 +27,7 @@ export const CARD_TYPES = {
 	},
 	peak: {
 		name: "Peak",
-		icon: "👁️",
+		icon: Eye,
 		bgColor: "bg-cyan-500",
 		textColor: "text-white",
 		description:
@@ -33,7 +35,7 @@ export const CARD_TYPES = {
 	},
 	skip: {
 		name: "Skip",
-		icon: "⏭️",
+		icon: SkipForward,
 		bgColor: "bg-emerald-500",
 		textColor: "text-white",
 		description:
@@ -41,7 +43,7 @@ export const CARD_TYPES = {
 	},
 	misdeal: {
 		name: "Misdeal",
-		icon: "🔀",
+		icon: Shuffle,
 		bgColor: "bg-blue-500",
 		textColor: "text-white",
 		description:
