@@ -25,3 +25,4 @@
 - [ ] UI: add credits page
 - [ ] Architecture: audit for abandonded AWS resources
 - [ ] UI: group players actions into turns on recent actions display
+- [x] Music: make sure song doesn't play on player devices

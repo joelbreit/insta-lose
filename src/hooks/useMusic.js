@@ -97,7 +97,11 @@ export function useMusic() {
    * Play the theme immediately without fade
    */
   const playTheme = async () => {
-    await serviceRef.current.playTheme();
+    const success = await serviceRef.current.playTheme();
+    if (!success) {
+      console.log('Theme will start on next user interaction');
+    }
+    return success;
   };
 
   return {
