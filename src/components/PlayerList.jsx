@@ -1,3 +1,5 @@
+import { PlayerIcon } from "./PlayerIcon";
+
 function PlayerList({ players, currentTurnPlayerId, showCardCount = false }) {
 	return (
 		<div className="space-y-3">
@@ -10,13 +12,22 @@ function PlayerList({ players, currentTurnPlayerId, showCardCount = false }) {
 							: "bg-gray-900 border-gray-600"
 					} ${!player.isAlive ? "opacity-40" : ""}`}
 				>
-					<div
-						className={`w-12 h-12 ${player.color} border-4 border-black flex items-center justify-center text-2xl`}
-					>
-						{player.icon}
-					</div>
+					<PlayerIcon
+						iconName={player.icon}
+						colorName={player.color}
+						size="md"
+						variant={
+							!player.isAlive
+								? "eliminated"
+								: currentTurnPlayerId === player.playerId
+								? "active"
+								: "default"
+						}
+					/>
 					<div className="flex-1">
-						<div className="font-bold text-lg text-cyan-300 tracking-wide">{player.name.toUpperCase()}</div>
+						<div className="font-bold text-lg text-cyan-300 tracking-wide">
+							{player.name.toUpperCase()}
+						</div>
 						{!player.isAlive && (
 							<div className="text-sm text-red-400 font-bold tracking-wide">
 								ELIMINATED

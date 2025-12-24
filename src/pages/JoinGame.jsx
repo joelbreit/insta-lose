@@ -10,8 +10,8 @@ function JoinGame() {
 	const navigate = useNavigate();
 	const [gameId, setGameId] = useState("");
 	const [playerName, setPlayerName] = useState("");
-	const [playerIcon, setPlayerIcon] = useState("🐶");
-	const [playerColor, setPlayerColor] = useState("bg-pink-500");
+	const [playerIcon, setPlayerIcon] = useState("cat");
+	const [playerColor, setPlayerColor] = useState("pink");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState(null);
 

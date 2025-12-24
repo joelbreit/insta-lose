@@ -3,11 +3,11 @@
 - [x] Bug: URLs are being cached by browsers, so when you try to join a game, it sometimes goes to old game pages
 - [x] Music: music should not be included at all on non-host screens
 - [ ] Music: host should loop through in-game tracks when unmuted in waiting/game screens
-- [ ] UI: Clean up choose icon/color
+- [x] UI: Clean up choose icon/color
   - [x] Pick random to start
-  - [ ] Make one button that when selected, brings up other options
-  - [ ] Add more icons and colors to choose from
-  - [ ] Lucid React Icons or maybe a bunch of SVGs
+  - [x] Make one button that when selected, brings up other options
+  - [x] Add more icons and colors to choose from
+  - [x] Lucid React Icons
 - [ ] UI: on the host game screen, show a visualization of all the players
 - [ ] UI: on the host game screen, show a visualization of the deck and discard pile as stacks of cards
 - [ ] UI: make it more clear when it is/is not your turn
@@ -18,3 +18,4 @@
 - [ ] Music: automatically play the theme when the game ends
 - [ ] UI: add footer to all pages
 - [ ] Refactor: Waiting room/game/recap could all be the same page
+- [ ] Refactor: address linting issues

@@ -114,17 +114,13 @@
 ```javascript
 {
   hostPlayerId: "player-uuid-1", // Generated client-side
-  hostName: "Joel",
-  hostIcon: "🐱",
-  hostColor: "bg-blue-500"
 }
 ```
 
 **Logic:**
 - Generate unique 6-character room code (check it doesn't exist)
-- Initialize game with host as first player
+- Initialize game with no players
 - Set status to "waiting"
-- Initialize shuffled deck
 
 **Output:**
 ```javascript

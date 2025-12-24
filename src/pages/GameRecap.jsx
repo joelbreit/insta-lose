@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useGameEndMusic } from "../hooks/useMusic";
 import { useMusic } from "../hooks/useMusic";
+import { PlayerIcon } from "../components/PlayerIcon";
 
 function GameRecap() {
 	const { gameId } = useParams();
@@ -158,11 +159,12 @@ function GameRecap() {
 							<div className="bevel-inner" />
 							<div className="bevel-content p-8">
 								<div className="flex items-center gap-6">
-									<div
-										className={`w-20 h-20 ${winner.color} border-4 border-black flex items-center justify-center text-4xl`}
-									>
-										{winner.icon}
-									</div>
+									<PlayerIcon
+										iconName={winner.icon}
+										colorName={winner.color}
+										size="xl"
+										variant="winner"
+									/>
 									<div className="text-left">
 										<div className="font-bold text-3xl text-cyan-300 tracking-wider mb-2">
 											{isWinner
@@ -220,11 +222,12 @@ function GameRecap() {
 										</div>
 
 										{/* Player info */}
-										<div
-											className={`w-14 h-14 ${p.color} border-4 border-black flex items-center justify-center text-3xl`}
-										>
-											{p.icon}
-										</div>
+										<PlayerIcon
+											iconName={p.icon}
+											colorName={p.color}
+											size="lg"
+											variant={!p.isAlive ? "eliminated" : isPlayerWinner ? "winner" : "default"}
+										/>
 										<div className="flex-1">
 											<div className="font-bold text-xl text-cyan-300 tracking-wide">
 												{p.name.toUpperCase()}

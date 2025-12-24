@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useMusic } from "../hooks/useMusic";
 import Header from "../components/Header";
+import { PlayerIcon } from "../components/PlayerIcon";
 
 const POLL_INTERVAL = 3000; // Fallback polling interval (3 seconds)
 
@@ -576,11 +577,11 @@ function Game() {
 													className="flex items-center gap-4 p-4 bg-gray-900 border-4 border-gray-600"
 												>
 													{actionPlayer && (
-														<div
-															className={`w-12 h-12 ${actionPlayer.color} border-4 border-black flex items-center justify-center text-2xl`}
-														>
-															{actionPlayer.icon}
-														</div>
+														<PlayerIcon
+															iconName={actionPlayer.icon}
+															colorName={actionPlayer.color}
+															size="md"
+														/>
 													)}
 													<div className="flex-1">
 														<div className="text-2xl font-bold text-green-300 tracking-wide">
@@ -774,9 +775,11 @@ function Game() {
 										}
 										className="flex items-center gap-3 px-6 py-4 bg-gradient-to-b from-purple-600 to-purple-800 border-4 border-purple-900 hover:from-purple-500 hover:to-purple-700"
 									>
-										<span className="text-2xl">
-											{p.icon}
-										</span>
+										<PlayerIcon
+											iconName={p.icon}
+											colorName={p.color}
+											size="md"
+										/>
 										<span className="font-bold text-xl text-cyan-300 tracking-wide">
 											{p.name.toUpperCase()}
 										</span>
