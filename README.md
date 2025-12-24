@@ -2,9 +2,13 @@
 
 A web-app based card game for playing with my family. It is free and does not require any sign-up or login. The game is partially hosted on a device and partailly through serverless web services. The game is an elimination game where players are eliminated by drawing insta-lose cards.
 
-> The UI flow works with mock data (no backend yet). You can navigate through all screens, select cards, and see the card info modals. The next step would be wiring up the AWS Lambda APIs per your plan.
+A host machine starts the game and shows plays the state of the game.
+
+Players can then join on other devices.
 
 ## Local Development
+
+> For full setup, run the scripts in the `scripts` folder, then copy from the output folder to `VITE_API_URL` and `VITE_WS_URL` in `.env`
 
 1. Install dependencies
 
@@ -19,3 +23,7 @@ npm run dev
 ```
 
 3. Open the browser and navigate to http://localhost:5173
+
+## Update Lambda Functions
+
+Run `./scripts/deploy-lambdas.sh` to update the Lambda functions.

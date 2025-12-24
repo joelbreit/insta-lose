@@ -208,7 +208,7 @@ exports.handler = async (event) => {
 					const matchingPairs = updatedGame.players[
 						playerIndex
 					].hand.filter((c) => c.type === pairType);
-					
+
 					// Player must have at least 2 matching pairs (including the one they're trying to play)
 					if (matchingPairs.length < 2) {
 						return {
@@ -273,8 +273,8 @@ exports.handler = async (event) => {
 							) {
 								const randomIndex = Math.floor(
 									Math.random() *
-										updatedGame.players[targetIndex].hand
-											.length
+									updatedGame.players[targetIndex].hand
+										.length
 								);
 								const stolenCard =
 									updatedGame.players[targetIndex].hand.splice(

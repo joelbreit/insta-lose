@@ -45,10 +45,15 @@
 
 - [x] A host machine hosts a shared view for all players to see. The host machine is the one that is hosting the game. No players use this machine during the game
 - [x] The host machine creates a game but does not start or participate in the game
+- [x] Music plays automatically on the host machine (not on players machines)
+  - [x] Restarts on waiting room, game, and recap
+  - [x] Recap just plays the victory theme
+  - [x] All 3 screens have a mute/unmute button
+  - [x] Waiting room/game have track number and next track button
 
 ### Serverless
 
-- [ ] Entire game state in one DynamoDB table entry:
+- [x] Entire game state in one DynamoDB table entry:
 
 ```json
 {
@@ -94,6 +99,11 @@
   ]
 }
 ```
+
+- [x] API Gateway handles API endpoints and WebSocket connections
+- [x] DynamoDB stores activeWebSocket connections
+- [x] Amplify hosts the frontend
+- [x] Lambda functions handle game logic and state updates
 
 ### API Endpoints
 
@@ -272,71 +282,77 @@ For MVP, clients will poll this endpoint every 2 seconds to get the latest game 
 
 ## Features
 
-- [ ] Create game view
-  - [ ] (Settings)
-- [ ] Join game view
-  - [ ] Game ID
-  - [ ] Name
-  - [ ] Icon
-  - [ ] Color
-  - [ ] Join button
-- [ ] Waiting room
-  - [ ] Host screen
-    - [ ] Show game ID
-    - [ ] Show player list
-    - [ ] Show messages
-      - [ ] No players: "Waiting for players to join" message
-      - [ ] 1+ players: "Waiting for MVP to start the game" message
-  - [ ] All players
-    - [ ] Player list: names, icons, colors
-  - [ ] MPV (first player to join is the MVP)
-    - [ ] "Start the game when all players are in" message
-    - [ ] Start button
-  - [ ] Players
-    - [ ] "Waiting for [MVP name] to start the game" message
-- [ ] Game view
-  - [ ] Host screen
-    - [ ] Game ID
-    - [ ] Player list
-      - [ ] Name, icon, color, numCards, isAlive
-    - [ ] Game state
-      - [ ] Current turn player
-    - [ ] Recent actions
+- [x] Create game view
+- [x] Join game view
+  - [x] Game ID
+  - [x] Name
+  - [x] Icon
+  - [x] Color
+  - [x] Join button
+- [x] Waiting room
+  - [x] Host screen
+    - [x] Show game ID
+    - [x] Show player list
+    - [x] Show messages
+      - [x] No players: "Waiting for players to join" message
+      - [x] 1+ players: "Waiting for MVP to start the game" message
+  - [x] All players
+    - [x] Player list: names, icons, colors
+  - [x] MPV (first player to join is the MVP)
+    - [x] "Start the game when all players are in" message
+    - [x] Start button
+  - [x] Players
+    - [x] "Waiting for [MVP name] to start the game" message
+- [x] Game view
+  - [x] Host screen
+    - [x] Game ID
+    - [x] Player list
+      - [x] Name, icon, color, numCards, isAlive
+    - [x] Game state
+      - [x] Current turn player
+    - [x] Recent actions
   - [ ] Your turn view
     - [ ] Bright theme
-    - [ ] Draw Card button
-  - [ ] Not your turn view
+    - [x] Draw Card button
+  - [x] Not your turn view
     - [ ] Gray theme
-  - [ ] All players
-    - [ ] Your cards component
-      - [ ] Horizontal scroll if necessary
-      - [ ] Mini cards components
-        - [ ] Name, icon
-        - [ ] When selected, show card actions component
-      - [ ] Card actions component
-        - [ ] Shown when a mini card is selected
-        - [ ] Play button (only enabled when the card is playable)
-        - [ ] Info button (shows the card info modal)
-      - [ ] Card Info modal 
-        - [ ] Activated when the info button is clicked
-        - [ ] Card name/icon
-        - [ ] Instructions for the card
-    - [ ] Game state modal
-      - [ ] Player list
-        - [ ] Name, icon, color, numCards, isAlive
-      - [ ] Deck
-        - [ ] Cards remaining
-      - [ ] Recent actions
-- [ ] Game recap view
-  - [ ] Player list
-    - [ ] Name, icon, color, numCards, isAlive
-    - [ ] Rank by elimination order
-  - [ ] Winner message
-  - [ ] Link to theme song
+  - [x] All players
+    - [x] Your cards component
+      - [x] Horizontal scroll if necessary
+      - [x] Mini cards components
+        - [x] Name, icon
+        - [x] When selected, show card actions component
+      - [x] Card actions component
+        - [x] Shown when a mini card is selected
+        - [x] Play button (only enabled when the card is playable)
+        - [x] Info button (shows the card info modal)
+      - [x] Card Info modal 
+        - [x] Activated when the info button is clicked
+        - [x] Card name/icon
+        - [x] Instructions for the card
+    - [x] Game state modal
+      - [x] Player list
+        - [x] Name, icon, color, numCards, isAlive
+      - [x] Deck
+        - [x] Cards remaining
+      - [x] Recent actions
+- [x] Game recap view
+  - [x] Player list
+    - [x] Name, icon, color, numCards, isAlive
+    - [x] Rank by elimination order
+  - [x] Winner message
+  - [x] Link to theme song
 
 For now, the game must be restarted from the host machine for a new game to start
 
 ## Tech Stack
 
-- [ ] React
-- [ ] Tailwind v4
+- [x] React
+- [x] Tailwind v4
+- [x] Lucide React Icons
+- [x] Lambda Functions
+- [x] DynamoDB
+- [x] API Gateway
+- [x] WebSocket API Gateway
+- [x] Amplify
+- [x] CloudWatch Logs
