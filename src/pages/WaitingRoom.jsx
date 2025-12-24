@@ -271,7 +271,7 @@ function WaitingRoom() {
 			<Header />
 			{isHost && (
 				// Top bar
-				<div className="bg-gradient-to-b from-gray-800 to-black border-b-4 border-cyan-500 px-4 py-4">
+				<div className="px-4 py-4">
 					<div className="flex justify-between items-center max-w-7xl mx-auto">
 						<div className="flex items-center gap-3">
 							<div className="font-mono text-2xl font-bold text-yellow-300 tracking-widest">
@@ -314,7 +314,7 @@ function WaitingRoom() {
 							{/* Track Number */}
 							<div className="px-4 py-2 bg-gradient-to-b from-gray-700 to-gray-900 border-4 border-gray-600">
 								<span className="font-bold text-green-300 tracking-wide text-sm">
-									TRACK {status.currentTrackIndex + 1}/7
+									TRACK {status.currentTrackIndex + 1}
 								</span>
 							</div>
 						</div>

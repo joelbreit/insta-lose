@@ -4,7 +4,7 @@
 - [x] Bug: URLs are being cached by browsers, so when you try to join a game, it sometimes goes to old game pages
 - [x] Music: music should not be included at all on non-host screens
 - [x] Music: host should loop through in-game tracks when unmuted in waiting/game screens
-- [ ] Music: track should advance to next track when switching from waiting room to game
+- [x] Music: track should advance to next track when switching from waiting room to game
 - [x] UI: Clean up choose icon/color
   - [x] Pick random to start
   - [x] Make one button that when selected, brings up other options
@@ -18,6 +18,7 @@
 - [ ] UI: give tracks names rather than numbers
 - [ ] UI: remove dashed red border from unplayable cards
 - [ ] Music: automatically play the theme when the game ends
-- [ ] UI: add footer to all pages
+- [x] UI: add footer to all pages
 - [ ] Refactor: Waiting room/game/recap could all be the same page
 - [ ] Refactor: address linting issues
+- [ ] Add credits page

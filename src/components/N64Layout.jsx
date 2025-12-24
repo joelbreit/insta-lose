@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import '../App.css';
+import Footer from './Footer';
 
 function N64Layout({ children }) {
   const [stars, setStars] = useState([]);
@@ -17,7 +18,7 @@ function N64Layout({ children }) {
   }, []);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden flex flex-col">
       {/* Grid background */}
       <div className="grid-bg" />
 
@@ -36,8 +37,9 @@ function N64Layout({ children }) {
       <div className="scanlines" />
 
       {/* Content */}
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1 flex flex-col">
         {children}
+        <Footer />
       </div>
     </div>
   );
