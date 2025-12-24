@@ -609,7 +609,15 @@ function Game() {
 															:{" "}
 															{action.type.toUpperCase()}
 														</div>
-														{action.cardType && (
+														{/* If draw, and not I'm not the player who drew the card, replace cardType with "CARD" */}
+														{action.type ===
+															"draw" &&
+														action.playerId !==
+															player?.playerId ? (
+															<div className="text-xl text-gray-400 font-bold tracking-wide">
+																CARD
+															</div>
+														) : (
 															<div className="text-xl text-yellow-300 font-bold tracking-wide">
 																{action.cardType.toUpperCase()}
 															</div>
@@ -949,6 +957,12 @@ function Game() {
 														:{" "}
 														{action.type.toUpperCase()}
 														{action.cardType &&
+															!(
+																action.type ===
+																	"draw" &&
+																action.playerId !==
+																	player?.playerId
+															) &&
 															` (${action.cardType.toUpperCase()})`}
 													</div>
 												);
