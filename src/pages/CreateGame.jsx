@@ -21,7 +21,10 @@ function CreateGame() {
 				hostPlayerId,
 			});
 
-			// Store host info in localStorage (not player info)
+			// Clear old data
+			localStorage.removeItem("player");
+			localStorage.removeItem("host");
+
 			localStorage.setItem(
 				"host",
 				JSON.stringify({
@@ -60,7 +63,9 @@ function CreateGame() {
 					<div className="bevel-inner" />
 					<div className="bevel-content p-8">
 						<p className="text-cyan-300 text-center text-xl tracking-wide leading-relaxed">
-							CREATE A GAME ROOM AND SHARE THE CODE WITH YOUR FRIENDS. YOU'LL BE ABLE TO WATCH THE GAME AS IT HAPPENS.
+							CREATE A GAME ROOM AND SHARE THE CODE WITH YOUR
+							FRIENDS. YOU'LL BE ABLE TO WATCH THE GAME AS IT
+							HAPPENS.
 						</p>
 					</div>
 				</div>

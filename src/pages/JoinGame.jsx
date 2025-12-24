@@ -32,7 +32,10 @@ function JoinGame() {
 				color: playerColor,
 			});
 
-			// Store player info in localStorage
+			// Clear old data
+			localStorage.removeItem("player");
+			localStorage.removeItem("host");
+
 			localStorage.setItem(
 				"player",
 				JSON.stringify({

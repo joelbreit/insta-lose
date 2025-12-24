@@ -1,4 +1,19 @@
-const ICONS = ["🐱", "🐶", "🦊", "🐻", "🐼", "🐨", "🦁", "🐸", "🐵", "🦄", "🐲", "👻"];
+import { useEffect } from "react";
+
+const ICONS = [
+	"🐱",
+	"🐶",
+	"🦊",
+	"🐻",
+	"🐼",
+	"🐨",
+	"🦁",
+	"🐸",
+	"🐵",
+	"🦄",
+	"🐲",
+	"👻",
+];
 const COLORS = [
 	"bg-blue-500",
 	"bg-pink-500",
@@ -11,6 +26,14 @@ const COLORS = [
 ];
 
 function PlayerSetup({ name, setName, icon, setIcon, color, setColor }) {
+	// Initialize with random icon and color on mount
+	useEffect(() => {
+		const randomIcon = ICONS[Math.floor(Math.random() * ICONS.length)];
+		const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+		setIcon(randomIcon);
+		setColor(randomColor);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []); // Only run on mount - setIcon and setColor are stable useState setters
 	return (
 		<div className="space-y-8">
 			{/* Name input */}
@@ -40,7 +63,7 @@ function PlayerSetup({ name, setName, icon, setIcon, color, setColor }) {
 					<label className="block text-lg font-bold mb-4 text-cyan-300 tracking-wide">
 						CHOOSE ICON
 					</label>
-					<div className="grid grid-cols-6 gap-3">
+					<div className="grid grid-cols-4 md:grid-cols-6 gap-3">
 						{ICONS.map((i) => (
 							<button
 								key={i}
