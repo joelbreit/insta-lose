@@ -1,30 +1,25 @@
 # Tasks
 
-- [ ] UI: give tracks names rather than numbers
 - [ ] Refactor: Waiting room/game/recap could all be the same page
 - [ ] Refactor: address linting issues
-- [ ] UI: add credits page
 - [ ] Architecture: audit for abandonded AWS resources
-- [ ] UI: group players actions into turns on recent actions display
-- [ ] Bug: theme is playing on winner's device
-- [ ] UI: show who players steal from
-- [ ] UI: show everyone when an insta-lose card is drawn
-- [ ] UI: move deck stack to center of player circle, remove discard stack, and make player circle even larger
+- [ ] (Bug) theme is playing on winner's device) - may just be cached old version of the game
 
 2025-12-26
 
 TODO:
-- [ ] UI: better wording for recent actions display
-  - [ ] [PLAYER] PLAYED [CARD]
-  - [ ] [PLAYER] DREW A CARD
-  - [ ] [PLAYER] SKIPPED THEIR TURN
-  - [ ] [PLAYER] MISDEALT THE DECK
-  - [ ] [PLAYER] STOLE A CARD FROM [PLAYER]
-  - [ ] [PLAYER] PEEKED AT THE DECK
-  - [ ] [PLAYER] DREW THE INSTA-LOSE CARD AND PLAYED A PANIC CARD
-  - [ ] [PLAYER] INSTA-LOST
+- [ ] UI: give tracks names rather than numbers
+- [ ] UI: make peek, must-play-panic, steel, and stolen-from events more obvious
+- [ ] Music: show/scroll lyrics on the recap page
+- [ ] UI: add Credits page
+- [ ] UI: keep cards grayed out when not playable even when not a player's turn
+- [ ] UI: move deck stack to center of player circle, remove discard stack, and make player circle even larger
+- [ ] UI: group players actions into turns on recent actions display
 
 DONE:
+- [x] UI: show everyone when an insta-lose card is drawn
+- [x] UI: show who players steal from
+- [x] UI: better wording for recent actions display
 - [x] Bug: next turn is sometimes the wrong player after an insta-lose is played
 - [x] Bug: show/check order of next cards
 - [x] UX: show instructions on host waiting room page

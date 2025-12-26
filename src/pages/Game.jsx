@@ -25,6 +25,48 @@ import { PlayerIcon } from "../components/PlayerIcon";
 
 const POLL_INTERVAL = 3000; // Fallback polling interval (3 seconds)
 
+function formatActionText(action, gameState) {
+	const normalizedCardType = action.cardType?.startsWith("pairs-")
+		? "pairs"
+		: action.cardType;
+	const cardTypeInfo = action.cardType
+		? CARD_TYPES[normalizedCardType]
+		: null;
+	const cardName = cardTypeInfo?.name || action.cardType?.toUpperCase() || "";
+
+	if (action.type === "draw") {
+		if (action.result === "eliminated") {
+			return "INSTA-LOST!!!";
+		} else if (action.result === "saved-by-panic") {
+			return "WAS SAVED BY A PANIC CARD!";
+		} else if (action.result === "drew-card") {
+			return "DREW A CARD!";
+		}
+	} else if (action.type === "playCard") {
+		if (action.cardType === "skip") {
+			return "SKIPPED THEIR TURN!";
+		} else if (action.cardType === "misdeal") {
+			return "MISDEALT THE DECK!";
+		} else if (action.cardType === "peek") {
+			return "PEEKED AT THE DECK!";
+		} else if (action.result === "stole-card" && action.targetPlayerId) {
+			const targetPlayer = gameState.players.find(
+				(p) => p.playerId === action.targetPlayerId
+			);
+			const targetName = targetPlayer?.name || "UNKNOWN";
+			return `STOLE A CARD FROM ${targetName.toUpperCase()}!`;
+		} else if (
+			action.result === "played" ||
+			action.result === "pair-played"
+		) {
+			return `PLAYED ${cardName.toUpperCase()}`;
+		}
+	}
+
+	// Fallback for any unhandled cases
+	return action.type.toUpperCase();
+}
+
 function Game() {
 	const { gameId } = useParams();
 	const navigate = useNavigate();
@@ -619,15 +661,10 @@ function Game() {
 															).toUpperCase()}
 														</div>
 														<div className="text-xs text-yellow-300 font-bold tracking-wide">
-															{action.type.toUpperCase()}
-															{action.type ===
-																"draw" &&
-															action.playerId !==
-																player?.playerId
-																? ""
-																: action.cardType
-																? `: ${action.cardType.toUpperCase()}`
-																: ""}
+															{formatActionText(
+																action,
+																gameState
+															)}
 														</div>
 													</div>
 												</div>
