@@ -10,12 +10,12 @@
 TODO:
 - [ ] UX: sound effects for card actions?
 - [ ] UI: better indicator of when it's your turn
-- [ ] UI: remove gray background from player circle
 - [ ] UI: give tracks names rather than numbers
 - [ ] UI: make peek, must-play-panic, steel, and stolen-from events more obvious
 - [ ] Music: show/scroll lyrics on the recap page
 
 DONE:
+- [x] UI: remove gray background from player circle
 - [x] UI: add Credits page
 - [x] UI: move deck stack to center of player circle, remove discard stack, and make player circle even larger
 - [x] UI: keep cards grayed out when not playable even when not a player's turn

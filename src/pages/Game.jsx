@@ -597,9 +597,9 @@ function Game() {
 					<div className="mx-auto w-full h-full flex gap-4">
 						{/* Left side - Players Circle (2/3 width) */}
 						<div className="basis-2/3 beveled-box">
-							<div className="bevel-outer" />
-							<div className="bevel-inner" />
-							<div className="bevel-content p-4 h-full flex flex-col">
+							<div className="bevel-outer bevel-outer-transparent" />
+							<div className="bevel-inner bevel-inner-transparent" />
+							<div className="bevel-content bevel-content-transparent p-4 h-full flex flex-col">
 								<div className="flex-1 flex items-center justify-center">
 									<PlayerCircle
 										players={gameState.players}
@@ -636,9 +636,9 @@ function Game() {
 
 						{/* Right side - Recent Turns (1/3 width) */}
 						<div className="basis-1/3 beveled-box">
-							<div className="bevel-outer" />
-							<div className="bevel-inner" />
-							<div className="bevel-content p-4 h-full flex flex-col">
+							<div className="bevel-outer bevel-outer-transparent" />
+							<div className="bevel-inner bevel-inner-transparent" />
+							<div className="bevel-content bevel-content-transparent p-4 h-full flex flex-col">
 								{/* Current Turn Indicator */}
 								<div className="mb-4 px-4 py-3 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 text-center">
 									<div className="text-xs font-bold text-black/70 tracking-wide mb-1">
@@ -706,7 +706,7 @@ function Game() {
 																size="sm"
 															/>
 														)}
-														<div className="text-sm font-bold text-green-300 tracking-wide truncate">
+														<div className="text-xl font-bold text-green-300 tracking-wide truncate">
 															{(
 																turnPlayer?.name ||
 																"HOST"
@@ -725,7 +725,7 @@ function Game() {
 																	key={
 																		actionIndex
 																	}
-																	className="text-xs text-yellow-300 font-bold tracking-wide pl-2 flex items-center gap-2"
+																	className="text-md text-yellow-300 font-bold tracking-wide pl-2 flex items-center gap-2"
 																>
 																	<span className="text-cyan-300 font-mono">
 																		{
@@ -931,9 +931,9 @@ function Game() {
 
 						{/* Player circle (compact) */}
 						<div className="beveled-box mb-8">
-							<div className="bevel-outer" />
-							<div className="bevel-inner" />
-							<div className="bevel-content p-6">
+							<div className="bevel-outer bevel-outer-transparent" />
+							<div className="bevel-inner bevel-inner-transparent" />
+							<div className="bevel-content bevel-content-transparent p-6">
 								<PlayerCircle
 									players={gameState.players}
 									currentTurnPlayerId={

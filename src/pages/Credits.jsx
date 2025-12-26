@@ -6,7 +6,9 @@ function Credits() {
 			<Header />
 
 			<main className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-				<h1 className="text-5xl font-bold mb-12 text-center text-yellow-300">CREDITS</h1>
+				<h1 className="text-5xl font-bold mb-12 text-center text-yellow-300">
+					CREDITS
+				</h1>
 
 				<div className="space-y-8">
 					<section className="beveled-box p-6">
@@ -17,7 +19,8 @@ function Credits() {
 								TECHNOLOGIES
 							</h2>
 							<p className="text-lg text-green-300 tracking-wide">
-								BUILT WITH REACT, REACT ROUTER, TAILWIND CSS, AND VITE. ICONS PROVIDED BY LUCIDE REACT.
+								BUILT WITH REACT, REACT ROUTER, TAILWIND CSS,
+								AND VITE. ICONS PROVIDED BY LUCIDE REACT.
 							</p>
 						</div>
 					</section>
@@ -30,7 +33,9 @@ function Credits() {
 								BACKEND
 							</h2>
 							<p className="text-lg text-green-300 tracking-wide">
-								RUNS ON AWS SERVERLESS: LAMBDA FUNCTIONS, DYNAMODB FOR GAME STATE, API GATEWAY FOR REST AND WEBSOCKET, HOSTED ON S3/AMPLIFY.
+								RUNS ON AWS SERVERLESS: LAMBDA FUNCTIONS,
+								DYNAMODB FOR GAME STATE, API GATEWAY FOR REST
+								AND WEBSOCKET, HOSTED ON S3/AMPLIFY.
 							</p>
 						</div>
 					</section>
@@ -43,7 +48,10 @@ function Credits() {
 								ARCHITECTURE
 							</h2>
 							<p className="text-lg text-green-300 tracking-wide">
-								HYBRID APPROACH: FRONTEND RUNS IN THE BROWSER, BACKEND USES SERVERLESS FUNCTIONS. REAL-TIME UPDATES VIA WEBSOCKETS, GAME STATE PERSISTED IN DYNAMODB.
+								HYBRID APPROACH: FRONTEND RUNS IN THE BROWSER,
+								BACKEND USES SERVERLESS FUNCTIONS. REAL-TIME
+								UPDATES VIA WEBSOCKETS, GAME STATE PERSISTED IN
+								DYNAMODB.
 							</p>
 						</div>
 					</section>
@@ -54,4 +62,3 @@ function Credits() {
 }
 
 export default Credits;
-

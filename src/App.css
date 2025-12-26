@@ -2,92 +2,104 @@
 
 /* Scanlines overlay */
 .scanlines {
-  position: absolute;
-  inset: 0;
-  opacity: 0.1;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(255, 255, 255, 0.1) 2px,
-    rgba(255, 255, 255, 0.1) 4px
-  );
+	position: absolute;
+	inset: 0;
+	opacity: 0.1;
+	pointer-events: none;
+	background-image: repeating-linear-gradient(
+		0deg,
+		transparent,
+		transparent 2px,
+		rgba(255, 255, 255, 0.1) 2px,
+		rgba(255, 255, 255, 0.1) 4px
+	);
 }
 
 /* Grid background */
 .grid-bg {
-  position: absolute;
-  inset: 0;
-  opacity: 0.05;
-  pointer-events: none;
-  background-image:
-    linear-gradient(#00FFFF 1px, transparent 1px),
-    linear-gradient(90deg, #00FFFF 1px, transparent 1px);
-  background-size: 50px 50px;
+	position: absolute;
+	inset: 0;
+	opacity: 0.05;
+	pointer-events: none;
+	background-image: linear-gradient(#00ffff 1px, transparent 1px),
+		linear-gradient(90deg, #00ffff 1px, transparent 1px);
+	background-size: 50px 50px;
 }
 
 /* Pixelated stars */
 .stars {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
 }
 
 .star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: #fff;
-  box-shadow: 0 0 2px #fff;
+	position: absolute;
+	width: 2px;
+	height: 2px;
+	background: #fff;
+	box-shadow: 0 0 2px #fff;
 }
 
 /* N64 3D Button */
 .n64-button {
-  position: relative;
-  display: inline-block;
+	position: relative;
+	display: inline-block;
 }
 
 .n64-button-shadow {
-  position: absolute;
-  inset: 0;
-  transform: translateY(6px);
-  border-radius: 0;
+	position: absolute;
+	inset: 0;
+	transform: translateY(6px);
+	border-radius: 0;
 }
 
 .n64-button-face {
-  position: relative;
-  border: 4px solid;
-  transition: transform 150ms;
+	position: relative;
+	border: 4px solid;
+	transition: transform 150ms;
 }
 
 .n64-button:hover .n64-button-face {
-  transform: translateY(4px);
+	transform: translateY(4px);
 }
 
 .n64-button:active .n64-button-face {
-  transform: translateY(6px);
+	transform: translateY(6px);
 }
 
 /* 3D Beveled Box */
 .beveled-box {
-  position: relative;
+	position: relative;
 }
 
 .bevel-outer {
-  position: absolute;
-  inset: -8px;
-  background: linear-gradient(to bottom right, #9ca3af, #4b5563);
+	position: absolute;
+	inset: -8px;
+	background: linear-gradient(to bottom right, #9ca3af, #4b5563);
 }
 
 .bevel-inner {
-  position: absolute;
-  inset: -4px;
-  background: linear-gradient(to bottom right, #374151, #111827);
+	position: absolute;
+	inset: -4px;
+	background: linear-gradient(to bottom right, #374151, #111827);
 }
 
 .bevel-content {
-  position: relative;
-  background: linear-gradient(to bottom, #1f2937, #000000);
-  border: 4px solid #4b5563;
+	position: relative;
+	background: linear-gradient(to bottom, #1f2937, #000000);
+	border: 4px solid #4b5563;
+}
+
+.bevel-content-transparent {
+	background: transparent !important;
+	border: none !important;
+}
+
+.bevel-outer-transparent {
+	background: transparent !important;
+}
+
+.bevel-inner-transparent {
+	background: transparent !important;
 }
