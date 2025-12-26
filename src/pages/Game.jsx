@@ -144,6 +144,16 @@ function Game() {
 		status,
 	} = useMusic();
 
+	// Store music functions in refs to avoid dependency issues
+	const playGameMusicRef = useRef(playGameMusic);
+	const stopRef = useRef(stop);
+
+	// Update refs when functions change
+	useEffect(() => {
+		playGameMusicRef.current = playGameMusic;
+		stopRef.current = stop;
+	}, [playGameMusic, stop]);
+
 	// Game state from server
 	const [gameState, setGameState] = useState({
 		status: "in-progress",
@@ -329,14 +339,14 @@ function Game() {
 	useEffect(() => {
 		if (isHost) {
 			// Try to start music (may fail due to autoplay policy)
-			playGameMusic();
+			playGameMusicRef.current();
 		}
 
 		// Clean up music when leaving game
 		return () => {
-			stop();
+			stopRef.current();
 		};
-	}, [isHost]); // can't add playGameMusic to dependencies because it will cause a loop
+	}, [isHost]);
 
 	const isMyTurn =
 		!isHost && gameState.currentTurnPlayerId === player?.playerId;

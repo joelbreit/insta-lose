@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import { getGameState } from "../services/api";
@@ -28,14 +28,24 @@ function GameRecap() {
 	useGameEndMusic();
 	const { isPlaying, pause, playTheme, stop } = useMusic();
 
+	// Store music functions in refs to avoid dependency issues
+	const playThemeRef = useRef(playTheme);
+	const stopRef = useRef(stop);
+
+	// Update refs when functions change
+	useEffect(() => {
+		playThemeRef.current = playTheme;
+		stopRef.current = stop;
+	}, [playTheme, stop]);
+
 	// Auto-start theme song game recap loads
 	useEffect(() => {
 		if (isHost) {
-			playTheme();
+			playThemeRef.current();
 		}
 
 		return () => {
-			stop();
+			stopRef.current();
 		};
 	}, [isHost]);
 

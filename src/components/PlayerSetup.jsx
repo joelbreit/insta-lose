@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { PLAYER_ICONS, PLAYER_COLORS, PlayerIcon, PlayerIconSelector } from "./PlayerIcon";
+import { PLAYER_ICONS, PLAYER_COLORS } from "../utils/playerConfig";
+import { PlayerIcon, PlayerIconSelector } from "./PlayerIcon";
 import { IconColorSelectorModal } from "./IconColorSelectorModal";
 
 function PlayerSetup({ name, setName, icon, setIcon, color, setColor }) {
@@ -9,8 +10,10 @@ function PlayerSetup({ name, setName, icon, setIcon, color, setColor }) {
 	useEffect(() => {
 		const iconKeys = Object.keys(PLAYER_ICONS);
 		const colorKeys = Object.keys(PLAYER_COLORS);
-		const randomIcon = iconKeys[Math.floor(Math.random() * iconKeys.length)];
-		const randomColor = colorKeys[Math.floor(Math.random() * colorKeys.length)];
+		const randomIcon =
+			iconKeys[Math.floor(Math.random() * iconKeys.length)];
+		const randomColor =
+			colorKeys[Math.floor(Math.random() * colorKeys.length)];
 		setIcon(randomIcon);
 		setColor(randomColor);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

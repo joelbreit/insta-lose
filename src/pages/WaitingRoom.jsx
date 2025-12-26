@@ -45,18 +45,28 @@ function WaitingRoom() {
 		status,
 	} = useMusic();
 
+	// Store music functions in refs to avoid dependency issues
+	const playGameMusicRef = useRef(playGameMusic);
+	const stopRef = useRef(stop);
+
+	// Update refs when functions change
+	useEffect(() => {
+		playGameMusicRef.current = playGameMusic;
+		stopRef.current = stop;
+	}, [playGameMusic, stop]);
+
 	// Auto-start music when game loads
 	useEffect(() => {
 		if (isHost) {
 			// Try to start music (may fail due to autoplay policy)
-			playGameMusic();
+			playGameMusicRef.current();
 		}
 
 		// Clean up music when leaving game
 		return () => {
-			stop();
+			stopRef.current();
 		};
-	}, [isHost]); // can't add playGameMusic to dependencies because it will cause a loop
+	}, [isHost]);
 
 	// Load player or host from localStorage
 	useEffect(() => {

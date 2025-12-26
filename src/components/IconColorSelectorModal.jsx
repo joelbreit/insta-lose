@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { PLAYER_ICONS, PLAYER_COLORS, PlayerIcon } from "./PlayerIcon";
+import { PLAYER_ICONS, PLAYER_COLORS } from "../utils/playerConfig";
+import { PlayerIcon } from "./PlayerIcon";
 import N64Button from "./N64Button";
 import "../App.css";
 
