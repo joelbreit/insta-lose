@@ -4,6 +4,7 @@ import { Skull } from "lucide-react";
 /**
  * Displays players arranged in a diamond/circular pattern
  * Highlights current turn, current player ("me"), and eliminated players
+ * Players are positioned according to turnOrder if provided
  */
 function PlayerCircle({
 	players,
@@ -11,8 +12,20 @@ function PlayerCircle({
 	currentPlayerId = null,
 	showCardCount = false,
 	compact = false,
+	turnOrder = null,
 }) {
-	const playerCount = players.length;
+	// Sort players by turnOrder if provided, otherwise use original order
+	const orderedPlayers = turnOrder
+		? turnOrder
+				.map((playerId) => players.find((p) => p.playerId === playerId))
+				.filter(Boolean) // Remove any undefined (players not found)
+				.concat(
+					// Add any players not in turnOrder at the end
+					players.filter((p) => !turnOrder.includes(p.playerId))
+				)
+		: players;
+
+	const playerCount = orderedPlayers.length;
 
 	// Calculate position for each player in a circle/diamond
 	const getPlayerPosition = (index, total) => {
@@ -98,7 +111,7 @@ function PlayerCircle({
 				className="absolute inset-0 w-full h-full pointer-events-none opacity-30"
 				viewBox="0 0 100 100"
 			>
-				{players.map((_, index) => {
+				{orderedPlayers.map((_, index) => {
 					const pos = getPlayerPosition(index, playerCount);
 					return (
 						<line
@@ -114,7 +127,7 @@ function PlayerCircle({
 					);
 				})}
 				{/* Connect adjacent players */}
-				{players.map((_, index) => {
+				{orderedPlayers.map((_, index) => {
 					const pos1 = getPlayerPosition(index, playerCount);
 					const pos2 = getPlayerPosition(
 						(index + 1) % playerCount,
@@ -136,7 +149,7 @@ function PlayerCircle({
 			</svg>
 
 			{/* Players */}
-			{players.map((player, index) => {
+			{orderedPlayers.map((player, index) => {
 				const { x, y } = getPlayerPosition(index, playerCount);
 				const state = getPlayerState(player);
 				const styles = getStateStyles(state);
@@ -180,9 +193,7 @@ function PlayerCircle({
 									<div className="absolute inset-0 flex items-center justify-center">
 										<Skull
 											className={`${
-												compact
-													? "w-4 h-4"
-													: "w-5 h-5"
+												compact ? "w-4 h-4" : "w-5 h-5"
 											} text-red-500`}
 											strokeWidth={3}
 										/>
@@ -211,7 +222,9 @@ function PlayerCircle({
                     font-bold text-yellow-300 tracking-wide
                   `}
 								>
-									{player.cardCount || player.hand?.length || 0}
+									{player.cardCount ||
+										player.hand?.length ||
+										0}
 								</div>
 							)}
 
@@ -248,4 +261,3 @@ function PlayerCircle({
 }
 
 export default PlayerCircle;
-

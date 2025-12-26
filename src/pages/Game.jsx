@@ -60,6 +60,7 @@ function Game() {
 		players: [],
 		myHand: [],
 		actions: [],
+		turnOrder: [],
 	});
 
 	const [isHost, setIsHost] = useState(false);
@@ -568,6 +569,7 @@ function Game() {
 												gameState.currentTurnPlayerId
 											}
 											showCardCount
+											turnOrder={gameState.turnOrder}
 										/>
 									</div>
 								</div>
@@ -800,6 +802,7 @@ function Game() {
 									currentPlayerId={player?.playerId}
 									showCardCount
 									compact
+									turnOrder={gameState.turnOrder}
 								/>
 							</div>
 						</div>
