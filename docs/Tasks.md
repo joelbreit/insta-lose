@@ -8,14 +8,14 @@
 - [ ] Architecture: audit for abandonded AWS resources
 - [ ] UI: group players actions into turns on recent actions display
 - [ ] Bug: theme is playing on winner's device
-- [ ] UX: show instructions on join game page
 - [ ] Bug: show/check order of next cards
 - [ ] UI: show who players steal from
 - [ ] UI: show everyone when an insta-lose card is drawn
-- [ ] Bug: next turn is sometimes the prior player after an insta-lose is played
+- [ ] Bug: next turn is sometimes the wrong player after an insta-lose is played
 
 2025-12-26
 
+- [x] UX: show instructions on host waiting room page
 - [x] Music: chiller music
 - [x] Bug: peak/peek spelling
 - [x] Bug: remove insta-lose cards from deck when they eliminate a player

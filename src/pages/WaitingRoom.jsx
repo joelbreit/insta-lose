@@ -323,6 +323,35 @@ function WaitingRoom() {
 			)}
 
 			<main className="mx-auto max-w-2xl px-4 py-12">
+				{/* Go to insta-lose.joelbreit.com to play */}
+				<div className="text-center mb-12">
+					<h2 className="text-2xl font-bold text-cyan-300 tracking-wider">
+						TO JOIN THIS GAME, GO TO{" "}
+						<a
+							href="https://insta-lose.joelbreit.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-yellow-300 hover:text-yellow-400"
+						>
+							insta-lose.joelbreit.com
+						</a>
+					</h2>
+				</div>
+				{/* <div className="text-center mb-12">
+					<p className="text-xl text-cyan-300 mb-4 font-bold tracking-wider">
+						TO JOIN THIS GAME, GO TO{" "}
+						<a
+							href="https://insta-lose.joelbreit.com"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-yellow-300 hover:text-yellow-400"
+						>
+							insta-lose.joelbreit.com
+						</a>
+					</p>
+				</div> */}
+
+				{/* Game code */}
 				<div className="text-center mb-12">
 					<p className="text-lg text-cyan-300 mb-4 font-bold tracking-wider">
 						GAME CODE
