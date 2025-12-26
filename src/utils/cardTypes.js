@@ -25,8 +25,8 @@ export const CARD_TYPES = {
 		description:
 			"Collect two matching Pairs cards and play them together to steal a random card from another player of your choice.",
 	},
-	peak: {
-		name: "Peak",
+	peek: {
+		name: "Peek",
 		icon: Eye,
 		bgColor: "bg-cyan-500",
 		textColor: "text-white",

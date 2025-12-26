@@ -56,16 +56,16 @@ Each Lambda function follows this pattern:
 3. Read/write DynamoDB game state
 4. Return response with CORS headers
 
-| Function | Type | Purpose |
-|----------|------|---------|
-| `createGame` | REST | Generate 6-char game code, create game in `waiting` status |
-| `joinGame` | REST | Add player to `players` array, broadcasts update via WebSocket |
-| `startGame` | REST | Build deck, deal cards, randomize turn order → `in-progress`, broadcasts |
-| `getGameState` | REST | Get current game state (initial load, filters hands by playerId) |
-| `takeAction` | REST | Execute player actions (`draw` or `playCard`), broadcasts update |
-| `onConnect` | WS | Store WebSocket connection in `InstaLoseConnections` table |
-| `onDisconnect` | WS | Remove connection from table on client disconnect |
-| `onDefault` | WS | Handle unexpected messages (no-op in v1) |
+| Function       | Type | Purpose                                                                  |
+| -------------- | ---- | ------------------------------------------------------------------------ |
+| `createGame`   | REST | Generate 6-char game code, create game in `waiting` status               |
+| `joinGame`     | REST | Add player to `players` array, broadcasts update via WebSocket           |
+| `startGame`    | REST | Build deck, deal cards, randomize turn order → `in-progress`, broadcasts |
+| `getGameState` | REST | Get current game state (initial load, filters hands by playerId)         |
+| `takeAction`   | REST | Execute player actions (`draw` or `playCard`), broadcasts update         |
+| `onConnect`    | WS   | Store WebSocket connection in `InstaLoseConnections` table               |
+| `onDisconnect` | WS   | Remove connection from table on client disconnect                        |
+| `onDefault`    | WS   | Handle unexpected messages (no-op in v1)                                 |
 
 **Shared Module**: `src/lambda/shared/broadcast.js` - Utility for broadcasting game state to all WebSocket connections in a game.
 
@@ -99,7 +99,7 @@ Each Lambda function follows this pattern:
 - **Insta-Lose** (💀): Auto-eliminates player unless Panic played
 - **Panic** (😱): Auto-saves from Insta-Lose, shuffles it back to deck
 - **Pairs A/B/C** (👯): Requires matching pair to steal random card from target
-- **Peak** (👁️): Preview top 3 deck cards
+- **Peek** (👁️): Preview top 3 deck cards
 - **Skip** (⏭️): End turn without drawing
 - **Misdeal** (🔀): Shuffle entire deck
 

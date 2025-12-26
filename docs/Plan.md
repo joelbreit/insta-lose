@@ -21,7 +21,7 @@
    1. insta-lose: if drawn, the player must play a panic card or else they are eliminated
    2. panic: can only be played when drawing an insta-lose card - allows the player to not insta-lose and place the insta-lose card back in the deck - their turn then ends
    3. pairs: pairs of pair cards can be played to steal a random card from another player
-   4. peak: allows the player to peak at the top [3] card of the deck without drawing it
+   4. peek: allows the player to peek at the top [3] card of the deck without drawing it
    5. skip: allows the player to skip (not draw a card) and end their turn
    6. misdeal: allows the player to misdeal (shuffle the deck)
 

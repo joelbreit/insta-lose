@@ -239,7 +239,7 @@ exports.handler = async (event) => {
 						action.result = "shuffled";
 						break;
 
-					case "peak":
+					case "peek":
 						// Return top 3 cards (client will display them)
 						action.peekedCards = updatedGame.deck.slice(-3);
 						action.result = "peeked";
