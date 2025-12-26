@@ -31,10 +31,11 @@
 - [ ] Music: chiller music
 - [ ] Bug: peak/peek spelling
 - [ ] Bug: show/check order of next cards
-- [ ] Bug: remove insta-lose cards from deck when they eliminate a player
 - [ ] UI: show who players steal from
 - [ ] UI: show everyone when an insta-lose card is drawn
+- [ ] Bug: next turn is sometimes the prior player after an insta-lose is played
 
 2025-12-26
 
+- [x] Bug: remove insta-lose cards from deck when they eliminate a player
 - [x] Bug: fix player circle positioning

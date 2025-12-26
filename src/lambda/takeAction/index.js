@@ -136,9 +136,8 @@ exports.handler = async (event) => {
 						updatedGame.players[playerIndex].isAlive = false;
 						action.result = "eliminated";
 
-						// Put insta-lose back in deck and shuffle
-						updatedGame.deck.push(drawnCard);
-						updatedGame.deck = shuffleArray(updatedGame.deck);
+						// Insta-lose card is removed from deck (not put back)
+						// This ensures the deck always has numPlayers - 1 insta-lose cards
 					} else {
 						// Auto-play panic card
 						updatedGame.players[playerIndex].hand.splice(
