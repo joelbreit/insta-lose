@@ -653,9 +653,6 @@ function Game() {
 								<div className="bevel-outer" />
 								<div className="bevel-inner" />
 								<div className="bevel-content p-4 h-full flex flex-col">
-									<div className="text-xl font-bold text-cyan-300 tracking-wider mb-2 text-center">
-										PLAYERS
-									</div>
 									<div className="flex-1 flex items-center justify-center">
 										<PlayerCircle
 											players={gameState.players}

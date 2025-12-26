@@ -65,7 +65,7 @@ function CardHand({
 					const cardPlayable = isCardPlayable
 						? isCardPlayable(card)
 						: true;
-					const isNotPlayable = canPlay && !cardPlayable;
+					const isNotPlayable = isCardPlayable && !cardPlayable;
 
 					return (
 						<button

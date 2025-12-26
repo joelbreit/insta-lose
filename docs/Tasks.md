@@ -8,15 +8,18 @@
 2025-12-26
 
 TODO:
+- [ ] UX: sound effects for card actions?
+- [ ] UI: better indicator of when it's your turn
+- [ ] UI: remove gray background from player circle
 - [ ] UI: give tracks names rather than numbers
 - [ ] UI: make peek, must-play-panic, steel, and stolen-from events more obvious
 - [ ] Music: show/scroll lyrics on the recap page
 - [ ] UI: add Credits page
-- [ ] UI: keep cards grayed out when not playable even when not a player's turn
 - [ ] UI: move deck stack to center of player circle, remove discard stack, and make player circle even larger
-- [ ] UI: group players actions into turns on recent actions display
 
 DONE:
+- [x] UI: keep cards grayed out when not playable even when not a player's turn
+- [x] UI: group and number players actions into turns on recent actions display
 - [x] UI: show everyone when an insta-lose card is drawn
 - [x] UI: show who players steal from
 - [x] UI: better wording for recent actions display
