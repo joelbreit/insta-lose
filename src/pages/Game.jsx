@@ -694,56 +694,83 @@ function Game() {
 										<span>TOP 3 CARDS OF THE DECK:</span>
 									</div>
 									<div className="flex justify-center gap-4">
-										{peekedCards.map((card) => {
-											const normalizedType =
-												card.type?.startsWith("pairs-")
-													? "pairs"
-													: card.type;
-											const cardType =
-												CARD_TYPES[normalizedType];
-											return (
-												<div
-													key={card.id}
-													className={`w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
-														cardType?.bgColor ||
-														"bg-slate-500"
-													} ${
-														cardType?.textColor ||
-														"text-white"
-													}`}
-													style={{
-														boxShadow:
-															"0 4px 0 #000",
-													}}
-												>
-													{cardType?.icon ? (
-														<cardType.icon
-															className="w-8 h-8"
-															strokeWidth={2.5}
-														/>
-													) : (
-														<span className="text-3xl">
-															?
-														</span>
-													)}
-													{card.type.startsWith(
+										{peekedCards
+											.slice()
+											.reverse()
+											.map((card, index) => {
+												const normalizedType =
+													card.type?.startsWith(
 														"pairs-"
-													) ? (
-														<span className="text-sm font-bold text-center px-1 tracking-wide">
-															{
-																card.type.split(
-																	"-"
-																)[1]
-															}
-														</span>
-													) : (
-														<span className="text-xs font-bold text-center px-1 tracking-wide">
-															{cardType?.name.toUpperCase()}
-														</span>
-													)}
-												</div>
-											);
-										})}
+													)
+														? "pairs"
+														: card.type;
+												const cardType =
+													CARD_TYPES[normalizedType];
+												const drawOrder = index + 1;
+												const orderLabels = [
+													"1ST",
+													"2ND",
+													"3RD",
+												];
+												return (
+													<div
+														key={card.id}
+														className="flex flex-col items-center gap-2"
+													>
+														<div className="text-sm font-bold text-yellow-300 tracking-wide">
+															DRAW{" "}
+															{orderLabels[index]}
+														</div>
+														<div
+															className={`relative w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
+																cardType?.bgColor ||
+																"bg-slate-500"
+															} ${
+																cardType?.textColor ||
+																"text-white"
+															}`}
+															style={{
+																boxShadow:
+																	"0 4px 0 #000",
+															}}
+														>
+															{/* Order indicator badge */}
+															<div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 rounded-full flex items-center justify-center shadow-lg">
+																<span className="text-sm font-bold text-black">
+																	{drawOrder}
+																</span>
+															</div>
+															{cardType?.icon ? (
+																<cardType.icon
+																	className="w-8 h-8"
+																	strokeWidth={
+																		2.5
+																	}
+																/>
+															) : (
+																<span className="text-3xl">
+																	?
+																</span>
+															)}
+															{card.type.startsWith(
+																"pairs-"
+															) ? (
+																<span className="text-sm font-bold text-center px-1 tracking-wide">
+																	{
+																		card.type.split(
+																			"-"
+																		)[1]
+																	}
+																</span>
+															) : (
+																<span className="text-xs font-bold text-center px-1 tracking-wide">
+																	{cardType?.name.toUpperCase()}
+																</span>
+															)}
+														</div>
+													</div>
+												);
+											})}
 									</div>
 									<button
 										onClick={() => setPeekedCards(null)}

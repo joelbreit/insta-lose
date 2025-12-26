@@ -1,6 +1,5 @@
 # Tasks
 
-- [ ] UI: on the host game screen, show a visualization of the deck and discard pile as stacks of cards
 - [ ] UI: give tracks names rather than numbers
 - [ ] Refactor: Waiting room/game/recap could all be the same page
 - [ ] Refactor: address linting issues
@@ -8,13 +7,26 @@
 - [ ] Architecture: audit for abandonded AWS resources
 - [ ] UI: group players actions into turns on recent actions display
 - [ ] Bug: theme is playing on winner's device
-- [ ] Bug: show/check order of next cards
 - [ ] UI: show who players steal from
 - [ ] UI: show everyone when an insta-lose card is drawn
-- [ ] Bug: next turn is sometimes the wrong player after an insta-lose is played
+- [ ] UI: move deck stack to center of player circle, remove discard stack, and make player circle even larger
 
 2025-12-26
 
+TODO:
+- [ ] UI: better wording for recent actions display
+  - [ ] [PLAYER] PLAYED [CARD]
+  - [ ] [PLAYER] DREW A CARD
+  - [ ] [PLAYER] SKIPPED THEIR TURN
+  - [ ] [PLAYER] MISDEALT THE DECK
+  - [ ] [PLAYER] STOLE A CARD FROM [PLAYER]
+  - [ ] [PLAYER] PEEKED AT THE DECK
+  - [ ] [PLAYER] DREW THE INSTA-LOSE CARD AND PLAYED A PANIC CARD
+  - [ ] [PLAYER] INSTA-LOST
+- [ ] Bug: next turn is sometimes the wrong player after an insta-lose is played
+
+DONE:
+- [x] Bug: show/check order of next cards
 - [x] UX: show instructions on host waiting room page
 - [x] Music: chiller music
 - [x] Bug: peak/peek spelling
@@ -23,7 +35,7 @@
 
 December 2025
 
-
+- [x] UI: on the host game screen, show a visualization of the deck and discard pile as stacks of cards
 - [x] UI: replace all emojis with icons
 - [x] Bug: URLs are being cached by browsers, so when you try to join a game, it sometimes goes to old game pages
 - [x] Music: music should not be included at all on non-host screens
