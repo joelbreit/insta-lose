@@ -42,6 +42,17 @@ function Header() {
 							>
 								ABOUT
 							</Link>
+							<Link
+								to="/credits"
+								className={`inline-flex items-center border-b-4 px-3 pt-1 text-lg font-bold tracking-wide ${
+									isActive("/credits")
+										? "border-cyan-500 text-cyan-300"
+										: "border-transparent text-gray-400 hover:border-cyan-700 hover:text-cyan-400"
+								}`}
+								style={{ textShadow: isActive("/credits") ? '2px 2px 0px #000' : 'none' }}
+							>
+								CREDITS
+							</Link>
 						</div>
 					</div>
 					<div className="flex items-center">
@@ -95,6 +106,16 @@ function Header() {
 							}`}
 						>
 							ABOUT
+						</Link>
+						<Link
+							to="/credits"
+							className={`block border-l-4 py-3 pl-4 pr-4 text-base font-bold tracking-wide ${
+								isActive("/credits")
+									? "border-cyan-500 bg-gray-800 text-cyan-300"
+									: "border-transparent text-gray-400 hover:border-cyan-700 hover:bg-gray-800 hover:text-cyan-400"
+							}`}
+						>
+							CREDITS
 						</Link>
 					</div>
 				</div>
