@@ -27,6 +27,12 @@ const MUSIC_SOURCES = {
     'https://cdn1.suno.ai/cd0c906a-3e59-4b5b-9445-7abe3f023463.m4a',
     'https://cdn1.suno.ai/0618f78f-4d28-4ea5-93bd-57cd9c2c811a.m4a',
 
+    // Chill
+    'https://cdn1.suno.ai/7b7956e1-16df-4bbc-83f6-2b796da2f5c5.m4a',
+    'https://cdn1.suno.ai/da7b8a6d-fe6a-47f0-a9a7-54a90c4ee331.m4a',
+    'https://cdn1.suno.ai/b3fb8202-bf49-4b12-a163-ef1e3d408196.m4a',
+    'https://cdn1.suno.ai/46f84ffe-2fdf-49c4-8011-c303ebaf444a.m4a',
+
   ],
   theme: 'https://cdn1.suno.ai/816631a0-62f4-478b-bd22-1875d93799ec.m4a',
 
