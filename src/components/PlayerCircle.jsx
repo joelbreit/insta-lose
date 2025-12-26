@@ -12,7 +12,9 @@ function PlayerCircle({
 	currentPlayerId = null,
 	showCardCount = false,
 	compact = false,
+	large = false,
 	turnOrder = null,
+	centerElement = null,
 }) {
 	// Sort players by turnOrder if provided, otherwise use original order
 	const orderedPlayers = turnOrder
@@ -89,21 +91,26 @@ function PlayerCircle({
 		}
 	};
 
+	// Get size class based on mode
+	const getSizeClass = () => {
+		if (compact) return "aspect-square max-w-xs";
+		if (large) return "aspect-square max-w-3xl";
+		return "aspect-square max-w-lg";
+	};
+
 	return (
-		<div
-			className={`relative w-full ${
-				compact ? "aspect-square max-w-xs" : "aspect-square max-w-md"
-			} mx-auto`}
-		>
-			{/* Center decoration */}
-			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-				<div
-					className={`${
-						compact ? "w-16 h-16" : "w-24 h-24"
-					} border-4 border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 rotate-45`}
-				>
-					<div className="absolute inset-1 border-2 border-gray-600 bg-gradient-to-br from-gray-700 to-gray-800" />
-				</div>
+		<div className={`relative w-full ${getSizeClass()} mx-auto`}>
+			{/* Center element or default decoration */}
+			<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+				{centerElement || (
+					<div
+						className={`${
+							compact ? "w-16 h-16" : "w-24 h-24"
+						} border-4 border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 rotate-45`}
+					>
+						<div className="absolute inset-1 border-2 border-gray-600 bg-gradient-to-br from-gray-700 to-gray-800" />
+					</div>
+				)}
 			</div>
 
 			{/* Connecting lines (decorative) */}
@@ -166,7 +173,7 @@ function PlayerCircle({
 						<div
 							className={`
                 flex flex-col items-center
-                ${compact ? "p-1.5" : "p-2"}
+                ${compact ? "p-1.5" : large ? "p-3" : "p-2"}
                 border-4 ${styles.border}
                 ${styles.bg}
                 ${styles.glow}
@@ -179,7 +186,7 @@ function PlayerCircle({
 								<PlayerIcon
 									iconName={player.icon}
 									colorName={player.color}
-									size={compact ? "sm" : "md"}
+									size={compact ? "sm" : large ? "lg" : "md"}
 									variant={
 										state === "eliminated"
 											? "eliminated"
@@ -193,7 +200,11 @@ function PlayerCircle({
 									<div className="absolute inset-0 flex items-center justify-center">
 										<Skull
 											className={`${
-												compact ? "w-4 h-4" : "w-5 h-5"
+												compact
+													? "w-4 h-4"
+													: large
+													? "w-7 h-7"
+													: "w-5 h-5"
 											} text-red-500`}
 											strokeWidth={3}
 										/>
@@ -204,11 +215,11 @@ function PlayerCircle({
 							{/* Name */}
 							<div
 								className={`
-                  ${compact ? "text-xs" : "text-sm"}
+                  ${compact ? "text-xs" : large ? "text-base" : "text-sm"}
                   font-bold tracking-wide
                   ${styles.text}
                   ${state === "eliminated" ? "line-through" : ""}
-                  mt-1 max-w-16 truncate text-center
+                  mt-1 ${large ? "max-w-24" : "max-w-16"} truncate text-center
                 `}
 							>
 								{player.name.toUpperCase()}
@@ -218,7 +229,7 @@ function PlayerCircle({
 							{showCardCount && player.isAlive && (
 								<div
 									className={`
-                    ${compact ? "text-xs" : "text-sm"}
+                    ${compact ? "text-xs" : large ? "text-base" : "text-sm"}
                     font-bold text-yellow-300 tracking-wide
                   `}
 								>
@@ -233,7 +244,7 @@ function PlayerCircle({
 								<div
 									className={`
                     absolute -top-1 -right-1
-                    ${compact ? "w-2 h-2" : "w-3 h-3"}
+                    ${compact ? "w-2 h-2" : large ? "w-4 h-4" : "w-3 h-3"}
                     bg-yellow-400 border-2 border-yellow-200
                     animate-ping
                   `}
@@ -245,7 +256,13 @@ function PlayerCircle({
 								<div
 									className={`
                     absolute -bottom-2 left-1/2 -translate-x-1/2
-                    ${compact ? "text-[8px] px-1" : "text-[10px] px-1.5"}
+                    ${
+						compact
+							? "text-[8px] px-1"
+							: large
+							? "text-xs px-2"
+							: "text-[10px] px-1.5"
+					}
                     bg-cyan-500 text-black font-bold tracking-wider
                   `}
 								>

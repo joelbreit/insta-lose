@@ -17,7 +17,6 @@ import {
 	Skull,
 	AlertCircle,
 	Eye,
-	Trash2,
 } from "lucide-react";
 import { useMusic } from "../hooks/useMusic";
 import Header from "../components/Header";
@@ -586,92 +585,86 @@ function Game() {
 				{/* SPECTATOR VIEW - Only for Host */}
 				{isHost ? (
 					<div className="mx-auto w-full h-full flex gap-4">
-						{/* Left side - Card piles and Players */}
-						<div className="flex-1 flex flex-col gap-4">
-							{/* Card Piles - styled like stacked cards */}
-							<div className="flex items-start gap-6">
-								{/* Draw Pile Stack */}
-								<div className="relative">
-									{/* Stack effect - bottom cards */}
-									<div className="absolute top-2 left-1 w-20 h-28 bg-gray-800 border-4 border-gray-900 rounded-sm" />
-									<div className="absolute top-1 left-0.5 w-20 h-28 bg-gray-700 border-4 border-gray-800 rounded-sm" />
-									{/* Top card */}
-									<div className="relative w-20 h-28 bg-gradient-to-br from-blue-600 to-blue-800 border-4 border-blue-900 rounded-sm flex flex-col items-center justify-center shadow-lg">
-										<Layers
-											className="w-8 h-8 text-cyan-300"
-											strokeWidth={2.5}
-										/>
-										<div className="text-2xl font-bold text-yellow-300 mt-1">
-											{gameState.deckCount}
-										</div>
-									</div>
-									<div className="text-center mt-2 text-sm font-bold text-cyan-300 tracking-wide">
-										DRAW
-									</div>
-								</div>
-
-								{/* Discard Pile Stack */}
-								<div className="relative">
-									{/* Stack effect - bottom cards (fewer) */}
-									{gameState.discardPileCount > 1 && (
-										<div className="absolute top-1 left-0.5 w-20 h-28 bg-gray-600 border-4 border-gray-700 rounded-sm" />
-									)}
-									{/* Top card */}
-									<div className="relative w-20 h-28 bg-gradient-to-br from-gray-500 to-gray-700 border-4 border-gray-800 rounded-sm flex flex-col items-center justify-center shadow-lg">
-										<Trash2
-											className="w-8 h-8 text-gray-300"
-											strokeWidth={2.5}
-										/>
-										<div className="text-2xl font-bold text-yellow-300 mt-1">
-											{gameState.discardPileCount}
-										</div>
-									</div>
-									<div className="text-center mt-2 text-sm font-bold text-gray-400 tracking-wide">
-										DISCARD
-									</div>
-								</div>
-
-								{/* Current Turn indicator - compact */}
-								<div className="ml-auto px-6 py-3 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900">
-									<div className="text-sm font-bold text-black tracking-wide">
-										CURRENT TURN
-									</div>
-									<div className="text-2xl font-bold text-black tracking-wider">
-										{(
-											gameState.players.find(
-												(p) =>
-													p.playerId ===
-													gameState.currentTurnPlayerId
-											)?.name || "..."
-										).toUpperCase()}
-									</div>
-								</div>
-							</div>
-
-							{/* Players Circle - takes remaining space */}
-							<div className="flex-1 beveled-box">
-								<div className="bevel-outer" />
-								<div className="bevel-inner" />
-								<div className="bevel-content p-4 h-full flex flex-col">
-									<div className="flex-1 flex items-center justify-center">
-										<PlayerCircle
-											players={gameState.players}
-											currentTurnPlayerId={
-												gameState.currentTurnPlayerId
-											}
-											showCardCount
-											turnOrder={gameState.turnOrder}
-										/>
-									</div>
+						{/* Left side - Players Circle (2/3 width) */}
+						<div className="basis-2/3 beveled-box">
+							<div className="bevel-outer" />
+							<div className="bevel-inner" />
+							<div className="bevel-content p-4 h-full flex flex-col">
+								<div className="flex-1 flex items-center justify-center">
+									<PlayerCircle
+										players={gameState.players}
+										currentTurnPlayerId={
+											gameState.currentTurnPlayerId
+										}
+										showCardCount
+										large
+										turnOrder={gameState.turnOrder}
+										centerElement={
+											<div className="relative">
+												{/* Stack effect - bottom cards */}
+												<div className="absolute top-4 left-2 w-32 h-44 bg-gray-800 border-4 border-gray-900 rounded-sm" />
+												<div className="absolute top-2 left-1 w-32 h-44 bg-gray-700 border-4 border-gray-800 rounded-sm" />
+												{/* Top card */}
+												<div className="relative w-32 h-44 bg-gradient-to-br from-blue-600 to-blue-800 border-4 border-blue-900 rounded-sm flex flex-col items-center justify-center shadow-lg">
+													<Layers
+														className="w-12 h-12 text-cyan-300"
+														strokeWidth={2.5}
+													/>
+													<div className="text-4xl font-bold text-yellow-300 mt-2">
+														{gameState.deckCount}
+													</div>
+												</div>
+												<div className="text-center mt-3 text-base font-bold text-cyan-300 tracking-wide">
+													DRAW PILE
+												</div>
+											</div>
+										}
+									/>
 								</div>
 							</div>
 						</div>
 
-						{/* Right side - Recent Turns */}
-						<div className="w-72 beveled-box flex-shrink-0">
+						{/* Right side - Recent Turns (1/3 width) */}
+						<div className="basis-1/3 beveled-box">
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
 							<div className="bevel-content p-4 h-full flex flex-col">
+								{/* Current Turn Indicator */}
+								<div className="mb-4 px-4 py-3 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 text-center">
+									<div className="text-xs font-bold text-black/70 tracking-wide mb-1">
+										CURRENT TURN
+									</div>
+									<div className="flex items-center justify-center gap-2">
+										{(() => {
+											const currentPlayer =
+												gameState.players.find(
+													(p) =>
+														p.playerId ===
+														gameState.currentTurnPlayerId
+												);
+											return currentPlayer ? (
+												<>
+													<PlayerIcon
+														iconName={
+															currentPlayer.icon
+														}
+														colorName={
+															currentPlayer.color
+														}
+														size="sm"
+													/>
+													<span className="text-lg font-bold text-black tracking-wider">
+														{currentPlayer.name.toUpperCase()}
+													</span>
+												</>
+											) : (
+												<span className="text-lg font-bold text-black tracking-wider">
+													...
+												</span>
+											);
+										})()}
+									</div>
+								</div>
 								<div className="text-lg font-bold text-cyan-300 tracking-wider mb-3 text-center">
 									RECENT TURNS
 								</div>
