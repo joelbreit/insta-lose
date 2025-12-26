@@ -23,9 +23,9 @@ TODO:
   - [ ] [PLAYER] PEEKED AT THE DECK
   - [ ] [PLAYER] DREW THE INSTA-LOSE CARD AND PLAYED A PANIC CARD
   - [ ] [PLAYER] INSTA-LOST
-- [ ] Bug: next turn is sometimes the wrong player after an insta-lose is played
 
 DONE:
+- [x] Bug: next turn is sometimes the wrong player after an insta-lose is played
 - [x] Bug: show/check order of next cards
 - [x] UX: show instructions on host waiting room page
 - [x] Music: chiller music

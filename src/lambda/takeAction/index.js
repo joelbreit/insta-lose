@@ -28,9 +28,30 @@ function getNextTurnPlayerId(game) {
 
 	if (alivePlayers.length <= 1) return null;
 
-	const currentIndex = alivePlayers.indexOf(game.currentTurnPlayerId);
-	const nextIndex = (currentIndex + 1) % alivePlayers.length;
-	return alivePlayers[nextIndex];
+	// Find the current player's position in the original turnOrder
+	const currentIndexInTurnOrder = game.turnOrder.indexOf(
+		game.currentTurnPlayerId
+	);
+
+	// If current player not found in turnOrder, fallback to first alive player
+	if (currentIndexInTurnOrder === -1) {
+		return alivePlayers[0];
+	}
+
+	// Find the next alive player in clockwise order from current position
+	// Start searching from the next position in turnOrder
+	for (let i = 1; i < game.turnOrder.length; i++) {
+		const nextIndex = (currentIndexInTurnOrder + i) % game.turnOrder.length;
+		const nextPlayerId = game.turnOrder[nextIndex];
+		const nextPlayer = game.players.find((p) => p.playerId === nextPlayerId);
+
+		if (nextPlayer?.isAlive) {
+			return nextPlayerId;
+		}
+	}
+
+	// Fallback (shouldn't reach here if there's at least one alive player)
+	return alivePlayers[0];
 }
 
 function checkWinCondition(game) {
