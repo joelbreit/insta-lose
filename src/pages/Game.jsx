@@ -67,6 +67,58 @@ function formatActionText(action, gameState) {
 	return action.type.toUpperCase();
 }
 
+// Group actions by turn for host view
+function groupActionsByTurn(actions) {
+	if (!actions || actions.length === 0) return [];
+
+	// Actions already have actionNumber from server (persistent across all game actions)
+	const turns = [];
+	let currentTurn = null;
+
+	for (const action of actions) {
+		// Start a new turn if:
+		// 1. No current turn
+		// 2. Different player
+		// 3. Previous action ended the turn
+		if (
+			!currentTurn ||
+			currentTurn.playerId !== action.playerId ||
+			(currentTurn.actions.length > 0 &&
+				(currentTurn.actions[currentTurn.actions.length - 1].type ===
+					"draw" ||
+					(currentTurn.actions[currentTurn.actions.length - 1]
+						.type === "playCard" &&
+						currentTurn.actions[currentTurn.actions.length - 1]
+							.cardType === "skip")))
+		) {
+			// Save previous turn if it exists
+			if (currentTurn) {
+				// Reverse actions within turn to show newest on top
+				currentTurn.actions.reverse();
+				turns.push(currentTurn);
+			}
+			// Start new turn
+			currentTurn = {
+				playerId: action.playerId,
+				actions: [action],
+			};
+		} else {
+			// Add to current turn
+			currentTurn.actions.push(action);
+		}
+	}
+
+	// Don't forget the last turn
+	if (currentTurn) {
+		// Reverse actions within turn to show newest on top
+		currentTurn.actions.reverse();
+		turns.push(currentTurn);
+	}
+
+	// Reverse to show most recent turns first
+	return turns.reverse();
+}
+
 function Game() {
 	const { gameId } = useParams();
 	const navigate = useNavigate();
@@ -618,54 +670,78 @@ function Game() {
 							</div>
 						</div>
 
-						{/* Right side - Recent Actions */}
+						{/* Right side - Recent Turns */}
 						<div className="w-72 beveled-box flex-shrink-0">
 							<div className="bevel-outer" />
 							<div className="bevel-inner" />
 							<div className="bevel-content p-4 h-full flex flex-col">
 								<div className="text-lg font-bold text-cyan-300 tracking-wider mb-3 text-center">
-									RECENT ACTIONS
+									RECENT TURNS
 								</div>
-								<div className="flex-1 overflow-y-auto space-y-2">
-									{gameState.actions
-										.slice(-10)
-										.reverse()
-										.map((action, i) => {
-											const actionPlayer =
+								<div className="flex-1 overflow-y-auto space-y-3">
+									{groupActionsByTurn(gameState.actions)
+										.slice(0, 6)
+										.map((turn, turnIndex) => {
+											const turnPlayer =
 												gameState.players.find(
 													(p) =>
 														p.playerId ===
-														action.playerId
+														turn.playerId
 												);
 											return (
 												<div
-													key={i}
-													className="flex items-center gap-2 p-2 bg-gray-900 border-2 border-gray-600"
+													key={turnIndex}
+													className="bg-gray-900 border-2 border-gray-600 p-2"
 												>
-													{actionPlayer && (
-														<PlayerIcon
-															iconName={
-																actionPlayer.icon
-															}
-															colorName={
-																actionPlayer.color
-															}
-															size="sm"
-														/>
-													)}
-													<div className="flex-1 min-w-0">
+													{/* Turn header */}
+													<div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-700">
+														{turnPlayer && (
+															<PlayerIcon
+																iconName={
+																	turnPlayer.icon
+																}
+																colorName={
+																	turnPlayer.color
+																}
+																size="sm"
+															/>
+														)}
 														<div className="text-sm font-bold text-green-300 tracking-wide truncate">
 															{(
-																actionPlayer?.name ||
+																turnPlayer?.name ||
 																"HOST"
 															).toUpperCase()}
+															{"'S TURN"}
 														</div>
-														<div className="text-xs text-yellow-300 font-bold tracking-wide">
-															{formatActionText(
+													</div>
+													{/* Turn actions */}
+													<div className="space-y-1">
+														{turn.actions.map(
+															(
 																action,
-																gameState
-															)}
-														</div>
+																actionIndex
+															) => (
+																<div
+																	key={
+																		actionIndex
+																	}
+																	className="text-xs text-yellow-300 font-bold tracking-wide pl-2 flex items-center gap-2"
+																>
+																	<span className="text-cyan-300 font-mono">
+																		{
+																			action.actionNumber
+																		}
+																		.
+																	</span>
+																	<span>
+																		{formatActionText(
+																			action,
+																			gameState
+																		)}
+																	</span>
+																</div>
+															)
+														)}
 													</div>
 												</div>
 											);

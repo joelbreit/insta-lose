@@ -334,6 +334,12 @@ exports.handler = async (event) => {
 			action.winner = winner;
 		}
 
+		// Track total action count for persistent numbering
+		updatedGame.totalActionCount = (updatedGame.totalActionCount || 0) + 1;
+
+		// Add action number to the action
+		action.actionNumber = updatedGame.totalActionCount;
+
 		// Add action to log
 		updatedGame.actions = [...(updatedGame.actions || []), action].slice(
 			-50

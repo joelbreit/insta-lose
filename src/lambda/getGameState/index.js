@@ -74,7 +74,7 @@ exports.handler = async (event) => {
 					isAlive: player.isAlive,
 				})),
 				myHand: [], // No hand for spectators
-				actions: game.actions?.slice(-10) || [], // Last 10 actions
+				actions: game.actions || [], // All stored actions (up to 50)
 				updatedAt: game.updatedAt,
 			};
 
@@ -111,7 +111,7 @@ exports.handler = async (event) => {
 			discardPileCount: game.discardPile?.length || 0,
 			players: filteredPlayers,
 			myHand,
-			actions: game.actions?.slice(-10) || [], // Last 10 actions
+			actions: game.actions || [], // All stored actions (up to 50)
 			updatedAt: game.updatedAt,
 		};
 

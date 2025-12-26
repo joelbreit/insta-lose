@@ -82,7 +82,7 @@ function filterGameStateForRecipient(game, playerId) {
 				isAlive: player.isAlive,
 			})),
 			myHand: [],
-			actions: game.actions?.slice(-10) || [],
+			actions: game.actions || [], // All stored actions (up to 50)
 			updatedAt: game.updatedAt,
 			winnerId: game.winnerId,
 		};
@@ -114,7 +114,7 @@ function filterGameStateForRecipient(game, playerId) {
 		discardPileCount: game.discardPile?.length || 0,
 		players: filteredPlayers,
 		myHand,
-		actions: game.actions?.slice(-10) || [],
+		actions: game.actions || [], // All stored actions (up to 50)
 		updatedAt: game.updatedAt,
 		winnerId: game.winnerId,
 	};
