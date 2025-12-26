@@ -306,6 +306,7 @@ exports.handler = async (event) => {
 								);
 								action.result = "stole-card";
 								action.targetPlayerId = targetPlayerId;
+								action.stolenCardType = stolenCard.type;
 							}
 						} else {
 							action.result = "pair-played";

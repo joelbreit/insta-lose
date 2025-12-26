@@ -15,14 +15,27 @@ import {
 	Wifi,
 	WifiOff,
 	Skull,
-	AlertCircle,
 	Eye,
+	ShieldAlert,
+	Grab,
+	UserX,
 } from "lucide-react";
 import { useMusic } from "../hooks/useMusic";
 import Header from "../components/Header";
 import { PlayerIcon } from "../components/PlayerIcon";
 
 const POLL_INTERVAL = 3000; // Fallback polling interval (3 seconds)
+
+// Helper function to get formatted card name
+function getCardDisplayName(cardType) {
+	if (!cardType) return "UNKNOWN";
+	const normalizedType = cardType.startsWith("pairs-") ? "pairs" : cardType;
+	const cardInfo = CARD_TYPES[normalizedType];
+	if (cardType.startsWith("pairs-")) {
+		return `PAIR ${cardType.split("-")[1]}`;
+	}
+	return cardInfo?.name?.toUpperCase() || cardType.toUpperCase();
+}
 
 function formatActionText(action, gameState) {
 	const normalizedCardType = action.cardType?.startsWith("pairs-")
@@ -127,8 +140,12 @@ function Game() {
 	const [error, setError] = useState(null);
 	const [showGameState, setShowGameState] = useState(false);
 	const [peekedCards, setPeekedCards] = useState(null);
-	const [actionResult, setActionResult] = useState(null);
 	const [wsConnected, setWsConnected] = useState(false);
+
+	// Event modal for important game events (peek, panic, steal, stolen-from)
+	const [eventModal, setEventModal] = useState(null);
+	// Track processed actions to avoid duplicate modals
+	const processedActionsRef = useRef(new Set());
 
 	// Refs for polling fallback
 	const pollIntervalRef = useRef(null);
@@ -351,12 +368,48 @@ function Game() {
 	const isMyTurn =
 		!isHost && gameState.currentTurnPlayerId === player?.playerId;
 
+	// Detect stolen-from events when gameState updates (for polling fallback)
+	useEffect(() => {
+		if (isHost || !player?.playerId || !gameState.actions) return;
+
+		for (const action of gameState.actions) {
+			const actionKey = `${action.actionNumber}-${action.type}`;
+			if (processedActionsRef.current.has(actionKey)) continue;
+
+			// Check if this player was stolen from
+			if (
+				action.type === "playCard" &&
+				action.result === "stole-card" &&
+				action.targetPlayerId === player.playerId &&
+				action.playerId !== player.playerId
+			) {
+				processedActionsRef.current.add(actionKey);
+				const thief = gameState.players.find(
+					(p) => p.playerId === action.playerId
+				);
+				const stolenCardName = getCardDisplayName(
+					action.stolenCardType
+				);
+				setEventModal({
+					type: "stolen-from",
+					title: "CARD STOLEN!",
+					message: `${
+						thief?.name?.toUpperCase() || "ANOTHER PLAYER"
+					} STOLE YOUR ${stolenCardName} CARD!`,
+					icon: UserX,
+					bgColor: "from-orange-600 to-orange-800",
+					borderColor: "border-orange-900",
+					stolenCardType: action.stolenCardType,
+				});
+			}
+		}
+	}, [gameState.actions, isHost, player?.playerId, gameState.players]);
+
 	const handleDrawCard = async () => {
 		if (!player || !isMyTurn || isActing) return;
 
 		setIsActing(true);
 		setError(null);
-		setActionResult(null);
 
 		try {
 			const result = await takeAction(gameId, {
@@ -364,20 +417,26 @@ function Game() {
 				actionType: "draw",
 			});
 
-			// Handle special results
+			// Handle special results with event modal
 			if (result.action?.result === "eliminated") {
-				setActionResult({
+				setEventModal({
 					type: "eliminated",
+					title: "INSTA-LOSE!!!",
 					message:
-						"You drew an Insta-Lose card and had no Panic card! You're out!",
+						"YOU DREW AN INSTA-LOSE CARD AND HAD NO PANIC CARD! YOU'RE OUT!",
 					icon: Skull,
+					bgColor: "from-red-600 to-red-800",
+					borderColor: "border-red-900",
 				});
 			} else if (result.action?.result === "saved-by-panic") {
-				setActionResult({
-					type: "saved",
+				setEventModal({
+					type: "saved-by-panic",
+					title: "PANIC SAVE!",
 					message:
-						"You drew an Insta-Lose card but your Panic card saved you!",
-					icon: AlertCircle,
+						"YOU DREW AN INSTA-LOSE CARD BUT YOUR PANIC CARD SAVED YOU!",
+					icon: ShieldAlert,
+					bgColor: "from-yellow-600 to-yellow-800",
+					borderColor: "border-yellow-900",
 				});
 			}
 
@@ -426,7 +485,6 @@ function Game() {
 
 		setIsActing(true);
 		setError(null);
-		setActionResult(null);
 		setPeekedCards(null);
 
 		try {
@@ -437,22 +495,38 @@ function Game() {
 				targetPlayerId,
 			});
 
-			// Handle peek result (from REST response, WebSocket will also send this)
+			// Handle peek result with event modal
 			if (result.action?.peekedCards) {
 				setPeekedCards(result.action.peekedCards);
+				setEventModal({
+					type: "peek",
+					title: "PEEK!",
+					message: "YOU PEEKED AT THE TOP 3 CARDS OF THE DECK!",
+					icon: Eye,
+					bgColor: "from-purple-600 to-purple-800",
+					borderColor: "border-purple-900",
+					showPeekedCards: true,
+				});
 			}
 
-			// Handle steal result
+			// Handle steal result with event modal
 			if (result.action?.result === "stole-card") {
 				const targetPlayer = gameState.players.find(
 					(p) => p.playerId === result.action.targetPlayerId
 				);
-				setActionResult({
+				const stolenCardName = getCardDisplayName(
+					result.action.stolenCardType
+				);
+				setEventModal({
 					type: "steal",
-					message: `You stole a card from ${
-						targetPlayer?.name || "another player"
+					title: "CARD STOLEN!",
+					message: `YOU STOLE A ${stolenCardName} FROM ${
+						targetPlayer?.name?.toUpperCase() || "ANOTHER PLAYER"
 					}!`,
-					icon: Users,
+					icon: Grab,
+					bgColor: "from-green-600 to-green-800",
+					borderColor: "border-green-900",
+					stolenCardType: result.action.stolenCardType,
 				});
 			}
 
@@ -762,139 +836,6 @@ function Game() {
 							</div>
 						)}
 
-						{/* Action result display */}
-						{actionResult && (
-							<div
-								className={`mb-6 p-6 border-4 text-center ${
-									actionResult.type === "eliminated"
-										? "bg-red-900 border-red-500"
-										: actionResult.type === "saved"
-										? "bg-yellow-900 border-yellow-500"
-										: "bg-purple-900 border-purple-500"
-								}`}
-							>
-								<div className="flex items-center justify-center gap-3 mb-3">
-									{actionResult.icon && (
-										<actionResult.icon
-											className="w-8 h-8 text-yellow-300"
-											strokeWidth={2.5}
-										/>
-									)}
-									<p className="text-xl font-bold text-yellow-300 tracking-wide">
-										{actionResult.message.toUpperCase()}
-									</p>
-								</div>
-								<button
-									onClick={() => setActionResult(null)}
-									className="px-4 py-2 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold tracking-wide"
-								>
-									DISMISS
-								</button>
-							</div>
-						)}
-
-						{/* Peeked cards display */}
-						{peekedCards && (
-							<div className="mb-6 beveled-box">
-								<div className="bevel-outer" />
-								<div className="bevel-inner" />
-								<div className="bevel-content p-6">
-									<div className="flex items-center justify-center gap-3 text-center text-cyan-300 font-bold text-xl tracking-wide mb-6">
-										<Eye
-											className="w-6 h-6"
-											strokeWidth={2.5}
-										/>
-										<span>TOP 3 CARDS OF THE DECK:</span>
-									</div>
-									<div className="flex justify-center gap-4">
-										{peekedCards
-											.slice()
-											.reverse()
-											.map((card, index) => {
-												const normalizedType =
-													card.type?.startsWith(
-														"pairs-"
-													)
-														? "pairs"
-														: card.type;
-												const cardType =
-													CARD_TYPES[normalizedType];
-												const drawOrder = index + 1;
-												const orderLabels = [
-													"1ST",
-													"2ND",
-													"3RD",
-												];
-												return (
-													<div
-														key={card.id}
-														className="flex flex-col items-center gap-2"
-													>
-														<div className="text-sm font-bold text-yellow-300 tracking-wide">
-															DRAW{" "}
-															{orderLabels[index]}
-														</div>
-														<div
-															className={`relative w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
-																cardType?.bgColor ||
-																"bg-slate-500"
-															} ${
-																cardType?.textColor ||
-																"text-white"
-															}`}
-															style={{
-																boxShadow:
-																	"0 4px 0 #000",
-															}}
-														>
-															{/* Order indicator badge */}
-															<div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 rounded-full flex items-center justify-center shadow-lg">
-																<span className="text-sm font-bold text-black">
-																	{drawOrder}
-																</span>
-															</div>
-															{cardType?.icon ? (
-																<cardType.icon
-																	className="w-8 h-8"
-																	strokeWidth={
-																		2.5
-																	}
-																/>
-															) : (
-																<span className="text-3xl">
-																	?
-																</span>
-															)}
-															{card.type.startsWith(
-																"pairs-"
-															) ? (
-																<span className="text-sm font-bold text-center px-1 tracking-wide">
-																	{
-																		card.type.split(
-																			"-"
-																		)[1]
-																	}
-																</span>
-															) : (
-																<span className="text-xs font-bold text-center px-1 tracking-wide">
-																	{cardType?.name.toUpperCase()}
-																</span>
-															)}
-														</div>
-													</div>
-												);
-											})}
-									</div>
-									<button
-										onClick={() => setPeekedCards(null)}
-										className="block mx-auto mt-6 px-6 py-3 bg-gradient-to-b from-gray-600 to-gray-800 border-4 border-gray-900 text-cyan-300 font-bold text-lg tracking-wide"
-									>
-										CLOSE
-									</button>
-								</div>
-							</div>
-						)}
-
 						{/* Turn indicator */}
 						<div className="text-center mb-8">
 							{!isAlive ? (
@@ -1035,6 +976,201 @@ function Game() {
 					canPlay={isMyTurn && !isActing}
 					isCardPlayable={isCardPlayable}
 				/>
+			)}
+
+			{/* Event Modal for important game events */}
+			{eventModal && (
+				<div className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-50">
+					<div className="beveled-box max-w-xl w-full animate-[pulse_0.5s_ease-in-out]">
+						<div className="bevel-outer" />
+						<div className="bevel-inner" />
+						<div
+							className={`bevel-content p-8 bg-gradient-to-b ${eventModal.bgColor}`}
+						>
+							{/* Icon and Title */}
+							<div className="flex flex-col items-center mb-6">
+								{eventModal.icon && (
+									<eventModal.icon
+										className="w-20 h-20 text-yellow-300 mb-4"
+										strokeWidth={2}
+									/>
+								)}
+								<h2 className="text-4xl font-bold text-yellow-300 tracking-widest text-center animate-pulse">
+									{eventModal.title}
+								</h2>
+							</div>
+
+							{/* Message */}
+							<p className="text-2xl font-bold text-white text-center tracking-wide mb-8">
+								{eventModal.message}
+							</p>
+
+							{/* Peeked Cards Display (if applicable) */}
+							{eventModal.showPeekedCards && peekedCards && (
+								<div className="mb-8">
+									<div className="text-lg font-bold text-cyan-300 tracking-wider text-center mb-4">
+										TOP 3 CARDS:
+									</div>
+									<div className="flex justify-center gap-4">
+										{peekedCards
+											.slice()
+											.reverse()
+											.map((card, index) => {
+												const normalizedType =
+													card.type?.startsWith(
+														"pairs-"
+													)
+														? "pairs"
+														: card.type;
+												const cardType =
+													CARD_TYPES[normalizedType];
+												const drawOrder = index + 1;
+												const orderLabels = [
+													"1ST",
+													"2ND",
+													"3RD",
+												];
+												return (
+													<div
+														key={card.id}
+														className="flex flex-col items-center gap-2"
+													>
+														<div className="text-sm font-bold text-yellow-300 tracking-wide">
+															DRAW{" "}
+															{orderLabels[index]}
+														</div>
+														<div
+															className={`relative w-24 h-32 border-4 border-black flex flex-col items-center justify-center ${
+																cardType?.bgColor ||
+																"bg-slate-500"
+															} ${
+																cardType?.textColor ||
+																"text-white"
+															}`}
+															style={{
+																boxShadow:
+																	"0 4px 0 #000",
+															}}
+														>
+															{/* Order indicator badge */}
+															<div className="absolute -top-3 -right-3 w-8 h-8 bg-gradient-to-b from-yellow-600 to-yellow-800 border-4 border-yellow-900 rounded-full flex items-center justify-center shadow-lg">
+																<span className="text-sm font-bold text-black">
+																	{drawOrder}
+																</span>
+															</div>
+															{cardType?.icon ? (
+																<cardType.icon
+																	className="w-8 h-8"
+																	strokeWidth={
+																		2.5
+																	}
+																/>
+															) : (
+																<span className="text-3xl">
+																	?
+																</span>
+															)}
+															{card.type.startsWith(
+																"pairs-"
+															) ? (
+																<span className="text-sm font-bold text-center px-1 tracking-wide">
+																	{
+																		card.type.split(
+																			"-"
+																		)[1]
+																	}
+																</span>
+															) : (
+																<span className="text-xs font-bold text-center px-1 tracking-wide">
+																	{cardType?.name.toUpperCase()}
+																</span>
+															)}
+														</div>
+													</div>
+												);
+											})}
+									</div>
+								</div>
+							)}
+
+							{/* Stolen Card Display (for steal/stolen-from events) */}
+							{eventModal.stolenCardType && (
+								<div className="mb-8 flex flex-col items-center">
+									<div className="text-lg font-bold text-cyan-300 tracking-wider text-center mb-4">
+										{eventModal.type === "steal"
+											? "YOU GOT:"
+											: "THEY TOOK:"}
+									</div>
+									{(() => {
+										const normalizedType =
+											eventModal.stolenCardType?.startsWith(
+												"pairs-"
+											)
+												? "pairs"
+												: eventModal.stolenCardType;
+										const cardType =
+											CARD_TYPES[normalizedType];
+										return (
+											<div
+												className={`relative w-28 h-36 border-4 border-black flex flex-col items-center justify-center ${
+													cardType?.bgColor ||
+													"bg-slate-500"
+												} ${
+													cardType?.textColor ||
+													"text-white"
+												}`}
+												style={{
+													boxShadow: "0 6px 0 #000",
+												}}
+											>
+												{cardType?.icon ? (
+													<cardType.icon
+														className="w-10 h-10"
+														strokeWidth={2.5}
+													/>
+												) : (
+													<span className="text-4xl">
+														?
+													</span>
+												)}
+												{eventModal.stolenCardType.startsWith(
+													"pairs-"
+												) ? (
+													<span className="text-lg font-bold text-center px-1 tracking-wide mt-1">
+														PAIR{" "}
+														{
+															eventModal.stolenCardType.split(
+																"-"
+															)[1]
+														}
+													</span>
+												) : (
+													<span className="text-sm font-bold text-center px-1 tracking-wide mt-1">
+														{cardType?.name.toUpperCase()}
+													</span>
+												)}
+											</div>
+										);
+									})()}
+								</div>
+							)}
+
+							{/* Dismiss Button */}
+							<button
+								onClick={() => {
+									setEventModal(null);
+									// Clear peeked cards when dismissing peek modal
+									if (eventModal.showPeekedCards) {
+										setPeekedCards(null);
+									}
+								}}
+								className="w-full py-4 bg-gradient-to-b from-gray-700 to-gray-900 border-4 border-black font-bold text-2xl text-yellow-300 tracking-wider hover:from-gray-600 hover:to-gray-800 transition-colors"
+							>
+								GOT IT!
+							</button>
+						</div>
+					</div>
+				</div>
 			)}
 
 			{/* Game state modal */}
