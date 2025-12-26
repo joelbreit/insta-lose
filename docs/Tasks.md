@@ -5,16 +5,14 @@
 - [ ] Architecture: audit for abandonded AWS resources
 - [ ] (Bug: theme is playing on winner's device) - may just be cached old version of the game
 - [ ] Music: show/scroll lyrics on the recap page
-
-2025-12-26
-
-TODO:
 - [ ] UX: sound effects for card actions?
 - [ ] UI: better indicator of when it's your turn
 - [ ] UI: give tracks names rather than numbers
-- [ ] UI: color-code recent turns actions
+
+2025-12-26
 
 DONE:
+- [x] UI: color-code recent turns actions
 - [x] UI: make peek, must-play-panic, steel, and stolen-from events more obvious
 - [x] UI: remove gray background from player circle
 - [x] UI: add Credits page

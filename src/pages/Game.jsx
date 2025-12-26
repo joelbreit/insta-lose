@@ -79,6 +79,32 @@ function formatActionText(action, gameState) {
 	return action.type.toUpperCase();
 }
 
+// Get color class for action based on what happened
+function getActionColorClass(action) {
+	if (action.type === "draw") {
+		if (action.result === "eliminated") {
+			return "text-red-400"; // Eliminated - red
+		} else if (action.result === "saved-by-panic") {
+			return "text-orange-400"; // Saved by panic - orange
+		}
+		return "text-green-500"; // Normal draw - green
+	} else if (action.type === "playCard") {
+		if (action.cardType === "skip") {
+			return "text-emerald-400"; // Skip - emerald
+		} else if (action.cardType === "misdeal") {
+			return "text-blue-400"; // Misdeal - blue
+		} else if (action.cardType === "peek") {
+			return "text-cyan-400"; // Peek - cyan
+		} else if (action.result === "stole-card") {
+			return "text-purple-400"; // Stole card - purple
+		} else if (action.result === "pair-played") {
+			return "text-purple-400"; // Pair played - purple
+		}
+		return "text-yellow-300"; // Other card plays - yellow
+	}
+	return "text-yellow-300"; // Default - yellow
+}
+
 // Group actions by turn for host view
 function groupActionsByTurn(actions) {
 	if (!actions || actions.length === 0) return [];
@@ -799,15 +825,19 @@ function Game() {
 																	key={
 																		actionIndex
 																	}
-																	className="text-md text-yellow-300 font-bold tracking-wide pl-2 flex items-center gap-2"
+																	className="text-md font-bold tracking-wide pl-2 flex items-center gap-2"
 																>
-																	<span className="text-cyan-300 font-mono">
+																	<span className="text-gray-500 font-mono">
 																		{
 																			action.actionNumber
 																		}
 																		.
 																	</span>
-																	<span>
+																	<span
+																		className={getActionColorClass(
+																			action
+																		)}
+																	>
 																		{formatActionText(
 																			action,
 																			gameState
