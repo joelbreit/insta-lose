@@ -5,8 +5,10 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 
 export default [
   { ignores: ['dist'] },
+  // React/browser configuration for frontend code
   {
     files: ['**/*.{js,jsx}'],
+    ignores: ['src/lambda/**'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -28,6 +30,22 @@ export default [
         'warn',
         { allowConstantExport: true },
       ],
+    },
+  },
+  // Node.js/CommonJS configuration for Lambda functions
+  {
+    files: ['src/lambda/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'script', // CommonJS
+      },
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
 ]

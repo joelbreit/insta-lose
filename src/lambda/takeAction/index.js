@@ -268,7 +268,7 @@ exports.handler = async (event) => {
 
 					case "pairs-A":
 					case "pairs-B":
-					case "pairs-C":
+					case "pairs-C": {
 						// Check if player has another matching pair
 						const pairType = card.type;
 						const matchIndex = updatedGame.players[
@@ -311,6 +311,7 @@ exports.handler = async (event) => {
 							action.result = "pair-played";
 						}
 						break;
+					}
 
 					default:
 						action.result = "played";

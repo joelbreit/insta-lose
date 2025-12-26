@@ -19,7 +19,7 @@ exports.handler = async (event) => {
 		if (event.body) {
 			message = JSON.parse(event.body);
 		}
-	} catch (e) {
+	} catch {
 		// Not JSON, that's fine
 	}
 	
