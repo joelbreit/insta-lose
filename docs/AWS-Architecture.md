@@ -71,7 +71,7 @@ Single-table design storing all game state in one item per game.
       "name": "Joel",
       "icon": "🐱",
       "color": "bg-blue-500",
-      "hand": [{ "id": "card-100", "type": "panic" }],
+      "hand": [{ "id": "card-100", "type": "save" }],
       "isAlive": true
     }
   ],

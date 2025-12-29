@@ -9,11 +9,14 @@
 - [ ] UI: better indicator of when it's your turn
 - [ ] UI: give tracks names rather than numbers
 
+2025-12-29
+
+- [ ] UX: switch inside joke card names to normal card names
+
 2025-12-26
 
-DONE:
 - [x] UI: color-code recent turns actions
-- [x] UI: make peek, must-play-panic, steel, and stolen-from events more obvious
+- [x] UI: make peek, must-play-save, steel, and stolen-from events more obvious
 - [x] UI: remove gray background from player circle
 - [x] UI: add Credits page
 - [x] UI: move deck stack to center of player circle, remove discard stack, and make player circle even larger

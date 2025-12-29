@@ -7,10 +7,10 @@ export const CARD_TYPES = {
 		bgColor: "bg-red-600", // Red
 		textColor: "text-white",
 		description:
-			"If you draw this card, you must play a Panic card immediately or you are eliminated from the game!",
+			"If you draw this card, you must play a Save card immediately or you are eliminated from the game!",
 	},
-	panic: {
-		name: "Panic",
+	save: {
+		name: "Save",
 		icon: AlertCircle,
 		bgColor: "bg-amber-500", // Amber
 		textColor: "text-white",
@@ -41,8 +41,8 @@ export const CARD_TYPES = {
 		description:
 			"End your turn without drawing a card. Play it safe!",
 	},
-	misdeal: {
-		name: "Misdeal",
+	shuffle: {
+		name: "Shuffle",
 		icon: Shuffle,
 		bgColor: "bg-blue-500", // Blue
 		textColor: "text-white",

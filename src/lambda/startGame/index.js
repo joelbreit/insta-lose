@@ -13,18 +13,18 @@ const TABLE_NAME = process.env.TABLE_NAME || "InstaLoseGames";
 
 const CARDS_PER_PLAYER = 5;
 const STARTING_HAND_SIZE = 7;
-// Minimum cards needed per player for initial hands (excluding panic card)
+// Minimum cards needed per player for initial hands (excluding save card)
 const CARDS_FOR_INITIAL_HANDS = STARTING_HAND_SIZE - 1;
 
 // Card types for deck building
 const CARD_TYPES = {
-	PANIC: "panic",
+	SAVE: "save",
 	PAIRS_A: "pairs-A",
 	PAIRS_B: "pairs-B",
 	PAIRS_C: "pairs-C",
 	PEEK: "peek",
 	SKIP: "skip",
-	MISDEAL: "misdeal",
+	SHUFFLE: "shuffle",
 	INSTA_LOSE: "insta-lose",
 };
 
@@ -65,8 +65,8 @@ function buildDeck(numPlayers) {
 		CARD_TYPES.SKIP,
 		CARD_TYPES.SKIP,
 		CARD_TYPES.SKIP,
-		CARD_TYPES.MISDEAL,
-		CARD_TYPES.MISDEAL,
+		CARD_TYPES.SHUFFLE,
+		CARD_TYPES.SHUFFLE,
 	];
 
 	// Add enough random cards to cover initial hands + gameplay buffer
@@ -98,12 +98,12 @@ function dealInitialHands(players, deck) {
 	const updatedPlayers = players.map((player) => ({
 		...player,
 		hand: [
-			// Everyone starts with 1 panic card
-			{ id: generateCardId(), type: CARD_TYPES.PANIC },
+			// Everyone starts with 1 save card
+			{ id: generateCardId(), type: CARD_TYPES.SAVE },
 		],
 	}));
 
-	// Deal remaining cards (STARTING_HAND_SIZE - 1 since they have panic)
+	// Deal remaining cards (STARTING_HAND_SIZE - 1 since they have save)
 	const cardsPerPlayer = STARTING_HAND_SIZE - 1;
 
 	for (let i = 0; i < cardsPerPlayer; i++) {

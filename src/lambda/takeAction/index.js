@@ -147,12 +147,12 @@ exports.handler = async (event) => {
 				action.cardType = drawnCard.type;
 
 				if (drawnCard.type === "insta-lose") {
-					// Check if player has panic card
-					const panicIndex = updatedGame.players[
+					// Check if player has save card
+					const saveIndex = updatedGame.players[
 						playerIndex
-					].hand.findIndex((c) => c.type === "panic");
+					].hand.findIndex((c) => c.type === "save");
 
-					if (panicIndex === -1) {
+					if (saveIndex === -1) {
 						// Player is eliminated
 						updatedGame.players[playerIndex].isAlive = false;
 						action.result = "eliminated";
@@ -160,20 +160,20 @@ exports.handler = async (event) => {
 						// Insta-lose card is removed from deck (not put back)
 						// This ensures the deck always has numPlayers - 1 insta-lose cards
 					} else {
-						// Auto-play panic card
+						// Auto-play save card
 						updatedGame.players[playerIndex].hand.splice(
-							panicIndex,
+							saveIndex,
 							1
 						);
 						updatedGame.discardPile.push({
-							id: `panic-${Date.now()}`,
-							type: "panic",
+							id: `save-${Date.now()}`,
+							type: "save",
 						});
 
 						// Put insta-lose back in deck and shuffle
 						updatedGame.deck.push(drawnCard);
 						updatedGame.deck = shuffleArray(updatedGame.deck);
-						action.result = "saved-by-panic";
+						action.result = "saved-by-save";
 					}
 				} else {
 					// Normal card - add to hand
@@ -211,13 +211,13 @@ exports.handler = async (event) => {
 				action.cardType = card.type;
 
 				// Validate card can be played
-				// Panic cards can only be auto-played when drawing insta-lose, not manually
-				if (card.type === "panic") {
+				// Save cards can only be auto-played when drawing insta-lose, not manually
+				if (card.type === "save") {
 					return {
 						statusCode: 400,
 						headers,
 						body: JSON.stringify({
-							error: "Panic cards can only be played automatically when you draw an Insta-Lose card",
+							error: "Save cards can only be played automatically when you draw an Insta-Lose card",
 						}),
 					};
 				}
@@ -254,7 +254,7 @@ exports.handler = async (event) => {
 						action.result = "skipped";
 						break;
 
-					case "misdeal":
+					case "shuffle":
 						// Shuffle the deck
 						updatedGame.deck = shuffleArray(updatedGame.deck);
 						action.result = "shuffled";

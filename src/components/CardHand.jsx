@@ -39,8 +39,8 @@ function CardHand({
 						isCardPlayable &&
 						!isCardPlayable(selectedCard) && (
 							<div className="text-sm text-yellow-300 px-4 py-2 font-bold tracking-wide">
-								{selectedCard.type === "panic"
-									? "PANIC CARDS AUTO-PLAY WHEN YOU DRAW INSTA-LOSE!"
+								{selectedCard.type === "save"
+									? "SAVE CARDS AUTO-PLAY WHEN YOU DRAW AN INSTA-LOSE!"
 									: "YOU NEED A MATCHING PAIR TO PLAY THIS CARD!"}
 							</div>
 						)}
@@ -87,8 +87,8 @@ function CardHand({
 							}}
 							title={
 								isNotPlayable
-									? card.type === "panic"
-										? "Panic cards can only be played automatically when you draw an Insta-Lose card"
+									? card.type === "save"
+										? "Save cards can only be played automatically when you draw an Insta-Lose card"
 										: "You need a matching pair card to play this card"
 									: undefined
 							}

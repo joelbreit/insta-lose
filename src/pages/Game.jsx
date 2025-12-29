@@ -49,16 +49,16 @@ function formatActionText(action, gameState) {
 	if (action.type === "draw") {
 		if (action.result === "eliminated") {
 			return "INSTA-LOST!!!";
-		} else if (action.result === "saved-by-panic") {
-			return "WAS SAVED BY A PANIC CARD!";
+		} else if (action.result === "saved-by-save") {
+			return "WAS SAVED BY A SAVE CARD!";
 		} else if (action.result === "drew-card") {
 			return "DREW A CARD!";
 		}
 	} else if (action.type === "playCard") {
 		if (action.cardType === "skip") {
 			return "SKIPPED THEIR TURN!";
-		} else if (action.cardType === "misdeal") {
-			return "MISDEALT THE DECK!";
+		} else if (action.cardType === "shuffle") {
+			return "SHUFFLED THE DECK!";
 		} else if (action.cardType === "peek") {
 			return "PEEKED AT THE DECK!";
 		} else if (action.result === "stole-card" && action.targetPlayerId) {
@@ -84,15 +84,15 @@ function getActionColorClass(action) {
 	if (action.type === "draw") {
 		if (action.result === "eliminated") {
 			return "text-red-400"; // Eliminated - red
-		} else if (action.result === "saved-by-panic") {
-			return "text-orange-400"; // Saved by panic - orange
+		} else if (action.result === "saved-by-save") {
+			return "text-orange-400"; // Saved by save - orange
 		}
 		return "text-green-500"; // Normal draw - green
 	} else if (action.type === "playCard") {
 		if (action.cardType === "skip") {
 			return "text-emerald-400"; // Skip - emerald
-		} else if (action.cardType === "misdeal") {
-			return "text-blue-400"; // Misdeal - blue
+		} else if (action.cardType === "shuffle") {
+			return "text-blue-400"; // Shuffle - blue
 		} else if (action.cardType === "peek") {
 			return "text-cyan-400"; // Peek - cyan
 		} else if (action.result === "stole-card") {
@@ -168,7 +168,7 @@ function Game() {
 	const [peekedCards, setPeekedCards] = useState(null);
 	const [wsConnected, setWsConnected] = useState(false);
 
-	// Event modal for important game events (peek, panic, steal, stolen-from)
+	// Event modal for important game events (peek, save, steal, stolen-from)
 	const [eventModal, setEventModal] = useState(null);
 	// Track processed actions to avoid duplicate modals
 	const processedActionsRef = useRef(new Set());
@@ -449,17 +449,17 @@ function Game() {
 					type: "eliminated",
 					title: "INSTA-LOSE!!!",
 					message:
-						"YOU DREW AN INSTA-LOSE CARD AND HAD NO PANIC CARD! YOU'RE OUT!",
+						"YOU DREW AN INSTA-LOSE CARD AND HAD NO SAVE CARD! YOU'RE OUT!",
 					icon: Skull,
 					bgColor: "from-red-600 to-red-800",
 					borderColor: "border-red-900",
 				});
-			} else if (result.action?.result === "saved-by-panic") {
+			} else if (result.action?.result === "saved-by-save") {
 				setEventModal({
-					type: "saved-by-panic",
-					title: "PANIC SAVE!",
+					type: "saved-by-save",
+					title: "SAVE SAVED YOU!",
 					message:
-						"YOU DREW AN INSTA-LOSE CARD BUT YOUR PANIC CARD SAVED YOU!",
+						"YOU DREW AN INSTA-LOSE CARD BUT YOUR SAVE CARD SAVED YOU!",
 					icon: ShieldAlert,
 					bgColor: "from-yellow-600 to-yellow-800",
 					borderColor: "border-yellow-900",
@@ -484,10 +484,10 @@ function Game() {
 		const card = gameState.myHand.find((c) => c.id === cardId);
 		if (!card) return;
 
-		// Panic cards can only be auto-played when drawing insta-lose, not manually
-		if (card.type === "panic") {
+		// Save cards can only be auto-played when drawing insta-lose, not manually
+		if (card.type === "save") {
 			setError(
-				"Panic cards can only be played automatically when you draw an Insta-Lose card"
+				"Save cards can only be played automatically when you draw an Insta-Lose card"
 			);
 			return;
 		}
@@ -585,8 +585,8 @@ function Game() {
 
 	// Check if a card is playable
 	const isCardPlayable = (card) => {
-		// Panic cards can only be auto-played when drawing insta-lose, not manually
-		if (card.type === "panic") {
+		// Save cards can only be auto-played when drawing insta-lose, not manually
+		if (card.type === "save") {
 			return false;
 		}
 

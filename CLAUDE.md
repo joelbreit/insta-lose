@@ -96,12 +96,12 @@ Each Lambda function follows this pattern:
 
 8 card types defined in `src/utils/cardTypes.js`:
 
-- **Insta-Lose** (💀): Auto-eliminates player unless Panic played
-- **Panic** (😱): Auto-saves from Insta-Lose, shuffles it back to deck
+- **Insta-Lose** (💀): Auto-eliminates player unless Save played
+- **Save** (😱): Auto-saves from Insta-Lose, shuffles the Insta-Lose card back to the draw pile
 - **Pairs A/B/C** (👯): Requires matching pair to steal random card from target
-- **Peek** (👁️): Preview top 3 deck cards
+- **Peek** (👁️): Preview top 3 cards of the draw pile
 - **Skip** (⏭️): End turn without drawing
-- **Misdeal** (🔀): Shuffle entire deck
+- **Shuffle** (🔀): Shuffle entire draw pile
 
 **Deck Building**: `(numPlayers × 6) + (numPlayers × 5) + (numPlayers - 1) Insta-Lose` plus random distribution of other card types.
 
